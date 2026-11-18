@@ -117,7 +117,7 @@
     el.innerHTML =
       '<div class="nc-box" role="dialog" aria-live="polite" aria-label="Cookie settings">' +
         '<p class="nc-t">Cookies on NUASA Library</p>' +
-        '<p class="nc-p">We use a few essential cookies to keep you signed in. With your OK, we also count which pages are used so we can improve the library.</p>' +
+        '<p class="nc-p">We use a few essential cookies to keep you signed in. With Accept all, we can improve the library and make learning seamless.</p>' +
         '<div class="nc-opts">' +
           '<div class="nc-row"><div><b>Essential</b><span>Keeps you signed in and remembers your light or dark mode and saved files. Always on.</span></div>' +
           '<input type="checkbox" checked disabled aria-label="Essential cookies, always on"></div>' +
