@@ -35,7 +35,9 @@
       rating: rating,
       comment: comment ? String(comment).slice(0, 1000) : null,
       file_name: fileName ? String(fileName).slice(0, 200) : null,
-      path: (location.pathname + location.hash).slice(0, 300)
+      path: (location.pathname + location.hash).slice(0, 300),
+      // Links the rating to the same anonymous visitor as downloads/searches (null without analytics consent)
+      visitor_id: (window.NUASAConsent && window.NUASAConsent.visitorId && window.NUASAConsent.visitorId()) || null
     };
     return Promise.resolve(sb.auth.getSession())
       .then(function (r) {
