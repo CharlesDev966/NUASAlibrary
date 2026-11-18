@@ -1,12 +1,15 @@
 /* Project AI Studio backend (Vercel serverless function, free plan).
-   Uses Google's free Gemini API. Keeps the key secret, checks sign-in, limits use per student and per day, streams text back. */
+   Talks to any OpenAI-compatible chat API. Default: Groq's free plan (llama-3.3-70b-versatile). xAI Grok works too (set AI_BASE_URL and AI_MODEL).
+   Keeps the key secret, checks sign-in, limits use per student and per day, streams text back. */
 const SB_URL = process.env.SUPABASE_URL || "https://wcikankedtelqbojzjdm.supabase.co";
 const SB_ANON = process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjaWthbmtlZHRlbHFib2p6amRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4NzQ4ODAsImV4cCI6MjEwNzQ1MDg4MH0.lo1ZscA3uVBsggtxHW9U2YPPDhQAWYa3pATioq83wQ4";
 const SB_SERVICE = process.env.SUPABASE_SERVICE_KEY;
-const AI_KEY = process.env.GEMINI_API_KEY;
+const AI_KEY = process.env.AI_API_KEY || process.env.GROQ_API_KEY || process.env.XAI_API_KEY;
+const AI_BASE = (process.env.AI_BASE_URL || (process.env.XAI_API_KEY && !process.env.AI_API_KEY && !process.env.GROQ_API_KEY ? "https://api.x.ai/v1" : "https://api.groq.com/openai/v1")).replace(/\/+$/, "");
 // Old-style service_role keys are JWTs (start with "eyJ") and go in both headers; new-style secret keys (sb_secret_...) go in "apikey" only.
 const SRV = k => (k && k.startsWith("eyJ")) ? { apikey: k, Authorization: "Bearer " + k } : { apikey: k };
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const MODEL = process.env.AI_MODEL || process.env.GROQ_MODEL || (AI_BASE.includes("x.ai") ? "grok-4.3" : "llama-3.3-70b-versatile");
+const PRIOR_CHARS = parseInt(process.env.AI_PRIOR_CHARS || "7000", 10); // how much earlier text is sent back for consistency (smaller = fewer tokens per call, which suits free plans)
 const USER_LIMIT = parseInt(process.env.PROJECT_USER_LIMIT || "20", 10);    // AI calls per student per 24h (9 = one full draft: plan + 8 parts; the rest are for regenerating parts)
 const GLOBAL_LIMIT = parseInt(process.env.PROJECT_GLOBAL_LIMIT || "160", 10); // AI calls for everyone per 24h (protects the free quota)
 
@@ -15,6 +18,19 @@ const CITES = ["APA 7th edition", "Harvard", "MLA", "Chicago", "IEEE"];
 const clean = (v, n) => String(v || "").replace(/[\u0000-\u001f]+/g, " ").trim().slice(0, n);
 const fail = (res, code, error) => { res.statusCode = code; res.setHeader("Content-Type", "application/json"); res.end(JSON.stringify({ error })); };
 const total = r => parseInt((r.headers.get("content-range") || "0/0").split("/")[1], 10) || 0;
+
+/* ---------- AI call helpers (OpenAI-compatible chat completions) ---------- */
+const shape = sc => sc.type === "ARRAY" ? [shape(sc.items)] : sc.type === "OBJECT" ? Object.fromEntries(Object.entries(sc.properties).map(([k, v]) => [k, shape(v)])) : (sc.enum ? sc.enum.join(" | ") : "string");
+const JSON_RULE = sc => `\n\nReturn ONLY one valid JSON object (no markdown, no commentary) in exactly this shape. Replace each placeholder with real content. Arrays hold as many items as the rules above ask for:\n${JSON.stringify(shape(sc))}`;
+function aiCall({ system, user, max, temp, json, stream }) {
+  const body = { model: MODEL, messages: [{ role: "system", content: system }, { role: "user", content: user }], max_tokens: max, temperature: temp };
+  if (json) body.response_format = { type: "json_object" };
+  if (stream) body.stream = true;
+  return fetch(AI_BASE + "/chat/completions", { method: "POST", headers: { Authorization: "Bearer " + AI_KEY, "content-type": "application/json" }, body: JSON.stringify(body) });
+}
+const aiText = d => ((d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || "");
+const aiErr = st => st === 429 ? "The free AI quota is busy right now. Wait a minute and try again." : (st === 401 || st === 403) ? "The AI key was rejected (code " + st + "). Please tell the NUASA admin." : "The assistant is unavailable right now (code " + st + ").";
+const parseJson = t => JSON.parse(String(t).replace(/^\s*```(?:json)?|```\s*$/g, "").trim());
 
 const TOPIC_LIMIT = parseInt(process.env.PROJECT_TOPIC_LIMIT || "12", 10); // topic searches per student per 24h
 const TOPIC_SYSTEM = `You are an experienced final-year project supervisor at a Nigerian university. You suggest project topics that a student can realistically finish in one or two semesters.
@@ -43,24 +59,15 @@ async function topicsMode(res, user, body) {
   } catch (e) { return fail(res, 500, "Usage check failed. Please try again."); }
 
   const msg = `Suggest 6 project topics.\nField of study: ${field}\nStudent interests: ${interest || "not stated, choose current and relevant areas"}\nPlace or sector focus: ${scope || "Nigeria in general"}\nAcademic level: ${level}\nPreferred approach: ${approach}\n\nFor each topic give: title (a proper academic title), angle (1 or 2 sentences on the problem or gap it addresses), method (one sentence: design, sample or sources, and analysis technique), data (where the student can realistically get the data), difficulty (Easy, Moderate or Challenging).`;
-  const gen = { temperature: 0.9, maxOutputTokens: 2500, responseMimeType: "application/json", responseSchema: TOPIC_SCHEMA };
-  if (/2\.5-flash/.test(MODEL)) gen.thinkingConfig = { thinkingBudget: 0 };
+  const TS = { type: "OBJECT", properties: { topics: TOPIC_SCHEMA } };
   let up;
-  try {
-    up = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
-      method: "POST", headers: { "x-goog-api-key": AI_KEY, "content-type": "application/json" },
-      body: JSON.stringify({ systemInstruction: { parts: [{ text: TOPIC_SYSTEM }] }, contents: [{ role: "user", parts: [{ text: msg }] }], generationConfig: gen }),
-    });
-  } catch (e) { return fail(res, 502, "The assistant could not be reached. Try again."); }
-  if (!up.ok) {
-    console.error("gemini topics", up.status, await up.text().catch(() => ""));
-    return fail(res, up.status === 429 ? 429 : 502, up.status === 429 ? "The free AI quota is busy right now. Wait a minute and try again." : "The assistant is unavailable right now (code " + up.status + ").");
-  }
+  try { up = await aiCall({ system: TOPIC_SYSTEM + JSON_RULE(TS), user: msg, max: 2500, temp: 0.9, json: true }); }
+  catch (e) { return fail(res, 502, "The assistant could not be reached. Try again."); }
+  if (!up.ok) { console.error("ai topics", up.status, await up.text().catch(() => "")); return fail(res, up.status === 429 ? 429 : 502, aiErr(up.status)); }
   let topics;
   try {
     const d = await up.json();
-    const txt = ((d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts) || []).map(p => p.text || "").join("");
-    const arr = JSON.parse(txt.replace(/^```json|```$/g, "").trim());
+    let arr = parseJson(aiText(d)); if (!Array.isArray(arr)) arr = arr.topics;
     topics = arr.filter(t => t && t.title).slice(0, 8).map(t => ({
       title: clean(t.title, 220), angle: clean(t.angle, 500), method: clean(t.method, 360), data: clean(t.data, 300),
       difficulty: ["Easy", "Moderate", "Challenging"].includes(t.difficulty) ? t.difficulty : "Moderate" }));
@@ -169,18 +176,14 @@ RULES
 8. controlName: "Department" or "Respondent Category" for a survey, "Firm Size" for ex post facto.
 9. theories: exactly 4 real, well known theories that suit the topic, each with its real proponent (for example "Activity-Based Costing Theory", "Cooper and Kaplan"). Only theories you are sure exist.
 10. Do not use dashes of any kind in any text.`;
-  const gen = { temperature: 0.6, maxOutputTokens: 4500, responseMimeType: "application/json", responseSchema: BP_SCHEMA };
-  if (/2\.5-flash/.test(MODEL)) gen.thinkingConfig = { thinkingBudget: 0 };
   let up;
-  try {
-    up = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, { method: "POST", headers: { "x-goog-api-key": AI_KEY, "content-type": "application/json" },
-      body: JSON.stringify({ systemInstruction: { parts: [{ text: BP_SYSTEM }] }, contents: [{ role: "user", parts: [{ text: msg }] }], generationConfig: gen }) });
-  } catch (e) { return fail(res, 502, "The assistant could not be reached. Try again."); }
-  if (!up.ok) { console.error("gemini blueprint", up.status, await up.text().catch(() => "")); return fail(res, up.status === 429 ? 429 : 502, up.status === 429 ? "The free AI quota is busy right now. Wait a minute and try again." : "The assistant is unavailable right now (code " + up.status + ")."); }
+  try { up = await aiCall({ system: BP_SYSTEM + JSON_RULE(BP_SCHEMA), user: msg, max: 4500, temp: 0.6, json: true }); }
+  catch (e) { return fail(res, 502, "The assistant could not be reached. Try again."); }
+  if (!up.ok) { console.error("ai blueprint", up.status, await up.text().catch(() => "")); return fail(res, up.status === 429 ? 429 : 502, aiErr(up.status)); }
   let bp;
   try {
-    const d = await up.json(), txt = ((d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts) || []).map(p => p.text || "").join("");
-    bp = STUDY.sanitizeBp(JSON.parse(txt.replace(/^```json|```$/g, "").trim()));
+    const d = await up.json();
+    bp = STUDY.sanitizeBp(parseJson(aiText(d)));
     if (!bp) throw new Error("incomplete");
     if (method !== "auto") bp.design = method;
     bp.field = field; if (pop) bp.population = pop;
@@ -498,26 +501,20 @@ module.exports = async (req, res) => {
   const level = LEVELS.includes(f.level) ? f.level : LEVELS[1], cite = CITES.includes(f.cite) ? f.cite : CITES[0];
   let S;
   try { S = STUDY.buildStudy(bp, { population: f.population, level, details: f.details }); } catch (e) { console.error("study", e); return fail(res, 400, "The project plan could not be read. Go back and tap Start again."); }
-  const prior = String(body.prior || "").slice(-12000);
+  const prior = String(body.prior || "").slice(-PRIOR_CHARS);
   const cites = (Array.isArray(body.cites) ? body.cites : []).slice(0, 90).map(c => clean(c, 90)).filter(Boolean);
 
   // 3. Limits: per student and for the whole site (keeps usage inside the free quota)
   if (!(await checkLimits(res, user))) return;
 
-  // 4. Build the prompt and stream the answer from Gemini
+  // 4. Build the prompt and stream the answer from the AI provider
   const msg = `${brief(bp, S, { level, field: bp.field })}\nCitation style: ${cite}\n\nTASK\n${sec.t(bp, S, { cite, level }, cites)}\n\nPROJECT TEXT WRITTEN SO FAR (for consistency only; do not repeat it):\n${prior || "(nothing yet)"}`;
-  const gen = { maxOutputTokens: Math.min(14000, Math.ceil(sec.words * 1.8) + 900), temperature: 0.75 };
-  if (/2\.5-flash/.test(MODEL)) gen.thinkingConfig = { thinkingBudget: 0 }; // spend the quota on writing, not hidden reasoning
   let up;
-  try {
-    up = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:streamGenerateContent?alt=sse`, {
-      method: "POST", headers: { "x-goog-api-key": AI_KEY, "content-type": "application/json" },
-      body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM }] }, contents: [{ role: "user", parts: [{ text: msg }] }], generationConfig: gen }),
-    });
-  } catch (e) { return fail(res, 502, "The assistant could not be reached. Try again."); }
+  try { up = await aiCall({ system: SYSTEM, user: msg, max: Math.min(14000, Math.ceil(sec.words * 1.8) + 900), temp: 0.75, stream: true }); }
+  catch (e) { return fail(res, 502, "The assistant could not be reached. Try again."); }
   if (!up.ok) {
-    console.error("gemini", up.status, await up.text().catch(() => ""));
-    return fail(res, up.status === 429 ? 429 : 502, up.status === 429 ? "The free AI quota is busy right now. Wait a minute and tap Continue." : "The assistant is unavailable right now (code " + up.status + "). Check the model name and API key, then try again.");
+    console.error("ai section", up.status, await up.text().catch(() => ""));
+    return fail(res, up.status === 429 ? 429 : 502, aiErr(up.status) + (up.status === 429 ? " Tap Continue to try again." : ""));
   }
 
   // Count this call only now that the AI accepted it, so failed attempts do not use up a student's daily drafts.
@@ -533,10 +530,11 @@ module.exports = async (req, res) => {
       while ((i = buf.indexOf("\n")) >= 0) {
         const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
         if (!line.startsWith("data:")) continue;
-        let ev; try { ev = JSON.parse(line.slice(5)); } catch (e) { continue; }
+        const payload = line.slice(5).trim(); if (payload === "[DONE]") continue;
+        let ev; try { ev = JSON.parse(payload); } catch (e) { continue; }
         if (ev.error) throw new Error("upstream");
-        const parts = ev.candidates && ev.candidates[0] && ev.candidates[0].content && ev.candidates[0].content.parts;
-        if (parts) for (const p of parts) if (p.text) { const o = ex.push(p.text); if (o) res.write(o); }
+        const t = ev.choices && ev.choices[0] && ev.choices[0].delta && ev.choices[0].delta.content;
+        if (t) { const o = ex.push(t); if (o) res.write(o); }
       }
     }
     const tail = ex.end(); if (tail) res.write(tail);
