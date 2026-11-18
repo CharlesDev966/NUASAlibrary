@@ -2411,6 +2411,9 @@ function crView(i){const c=COURSES[i],un=ul(),o=un.some(k=>k.indexOf(c.pl+"@")==
 /* ---- Udemy-style course page (opens when a student taps a course) ----
    Ratings are REAL: students who unlock a course and sign in can rate it (table course_reviews, see course-reviews.sql).
    Until the first rating comes in, the page shows "New". Edit CRX below to change the text on the Excel course page. */
+/* MASTERCLASS PREVIEW LOCK. While this is false, nobody can watch the free video preview (the play button and the Preview links are hidden).
+   Students who have already unlocked a course are not affected. Change it to true when the previews are ready for the public. */
+const PREVIEW_OPEN=false;
 const CRS_UPDATED="November 2026";
 const CRX={"XL-4821":{sub:"Learn Excel from your very first click to PivotTables, dashboards and automation, with short step-by-step videos you can follow at your own pace.",
  learn:["Build your first spreadsheet from scratch with confidence","Format, sort and filter data so it is clean and easy to read","Use formulas and functions: SUM, IF, VLOOKUP, XLOOKUP, SUMIF and more","Create charts, conditional formatting and sparklines that tell a story","Analyse large data sets with PivotTables, slicers and PivotCharts","Work faster with data validation, Tables and keyboard shortcuts","Record macros and combine everything into a business dashboard","Finish with a capstone project and earn your NUASA certificate"],
@@ -2431,7 +2434,7 @@ function rvList(i){const c=COURSES[i],r=RV[c.pl]||[],a=rvAgg(c.pl),el=g("cpRv");
 let cpRate=0;
 function crPageClose(back){const p=g("cpg");if(!p)return;p.remove();document.body.style.overflow="";if(back&&location.hash.indexOf("#course-")===0)history.back()}
 function crPage(i){crPageClose();const c=COURSES[i],x=CRX[c.code]||{},o=ul().some(k=>k.indexOf(c.pl+"@")===0),t=esc2(c.t);cpRate=0;
- const tl=c.mods.reduce((a,m)=>a+m.t.length,0),lv=c.mods.reduce((a,m)=>a+lvOf(m),0),dur=x.dur||[],pv=c.vids?(x.preview||[]):[];
+ const tl=c.mods.reduce((a,m)=>a+m.t.length,0),lv=c.mods.reduce((a,m)=>a+lvOf(m),0),dur=x.dur||[],pv=c.vids&&(PREVIEW_OPEN||o)?(x.preview||[]):[];
  const mins=dur.reduce((a,d)=>{const p=d.split(":");return a+(+p[0])*60+(+p[1])},0),vt=mins?Math.round(mins/60)+" min":"";
  let off=0;const mods=c.mods.map((m,mi)=>{const base=off,l=lvOf(m);off+=l;
   return '<details class="cpM" '+(mi===0?"open":"")+'><summary><span>'+esc2(m.n)+'</span><em>'+m.t.length+' lessons</em></summary><ul>'+m.t.map((ls,k)=>{const live=k<l,vi=base+k,ic=live?'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M10 9l4 2.5-4 2.5z"/></svg>':'<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
@@ -2463,7 +2466,7 @@ function crPage(i){crPageClose();const c=COURSES[i],x=CRX[c.code]||{},o=ul().som
   if(b.dataset.back){e.preventDefault();crPageClose(true);return}
   if(b.dataset.buy){crPageClose(true);setTimeout(()=>crPay(i),60);return}
   if(b.dataset.go){crPageClose(true);setTimeout(()=>{const a=g("crg");if(a)a.scrollIntoView({behavior:"smooth",block:"center"})},120);return}
-  if(b.dataset.pv!=null&&c.vids){const v=c.vids[+b.dataset.pv];if(!v)return;g("cpHero").innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+v+'?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&playsinline=1" title="'+t+'" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';el.scrollTo({top:0,behavior:"smooth"});return}
+  if(b.dataset.pv!=null&&c.vids&&(PREVIEW_OPEN||ul().some(k=>k.indexOf(c.pl+"@")===0))){const v=c.vids[+b.dataset.pv];if(!v)return;g("cpHero").innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+v+'?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&playsinline=1" title="'+t+'" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';el.scrollTo({top:0,behavior:"smooth"});return}
   if(b.dataset.st){cpRate=+b.dataset.st;document.querySelectorAll("#cpPick button").forEach(k=>k.classList.toggle("on",+k.dataset.st<=cpRate));return}
   if(b.id==="cpSb"){if(!cpRate)return toast("Tap the stars to choose a rating.");
    if(!S.user){toast("Please sign in to leave a rating.");if(typeof openAuth==="function")openAuth("in");return}
