@@ -8,6 +8,16 @@
  *   .open()          show the banner / settings again
  *   .allowed()       true if analytics was accepted
  *   .track(name, p)  log an event to Supabase (does nothing without consent)
+ *   .visitorId()     the anonymous visitor ID, or null without consent
+ *   .pref.get(k, d) / .pref.set(k, v)   remembered preferences (stay on this device)
+ *   .recent.list() / .recent.add({id,name,url}) / .recent.clear()   last opened files (stay on this device)
+ *   .clearPersonal() wipe saved preferences and recent files
+ *
+ * Tracked automatically once analytics is accepted:
+ *   page_view, download (a[download] or [data-download]), file_open ([data-open]),
+ *   search (input[type=search] or [data-search]), time_on_page (seconds, per page)
+ * Optional attributes on links/buttons: data-file-name, data-file-id
+ * Event: window "nuasa:recent" fires whenever the recent list changes.
  */
 (function () {
   "use strict";
@@ -45,7 +55,12 @@
     var was = allowed();
     setCookie(CK, JSON.stringify({ v: VER, a: analytics ? 1 : 0, t: Date.now() }), YEAR);
     if (!analytics) delCookie(VID);          // withdrawing consent removes the visitor ID
-    if (analytics && !was) track("page_view"); // first moment we are allowed to count anything
+    if (analytics && !was) {                   // first moment we are allowed to count anything
+      visibleMs = 0;
+      lastShown = document.visibilityState === "visible" ? Date.now() : 0;
+      lastPath = location.pathname + location.hash;
+      track("page_view");
+    }
   }
   function allowed() {
     var c = read();
@@ -54,16 +69,15 @@
 
   /* ---------- analytics (first-party, to our own Supabase) ---------- */
   var sentReferrer = false;
-  function track(name, props) {
+  function track(name, props, pathOverride) {
     if (!allowed()) return;
     var sb = window.NUASA_SB;
     if (!sb || !sb.from) return;
-    var v = getCookie(VID);
-    if (!v) { v = uuid(); setCookie(VID, v, YEAR); }
+    var v = vid();
     var row = {
       visitor_id: v,
       name: String(name).slice(0, 60),
-      path: (location.pathname + location.hash).slice(0, 300),
+      path: (pathOverride || location.pathname + location.hash).slice(0, 300),
       referrer: sentReferrer ? null : (document.referrer || "").slice(0, 300) || null,
       props: props || {}
     };
@@ -75,6 +89,94 @@
         return sb.from("events").insert(row);
       })
       .catch(function () { /* analytics must never break the app */ });
+  }
+
+  function vid() {
+    if (!allowed()) return null;
+    var v = getCookie(VID);
+    if (!v) { v = uuid(); setCookie(VID, v, YEAR); }
+    return v;
+  }
+
+  /* ---------- richer analytics: downloads, opens, searches, time on page ---------- */
+  var lastPath = location.pathname + location.hash;
+  var visibleMs = 0;
+  var lastShown = document.visibilityState === "visible" ? Date.now() : 0;
+
+  function flushTime(reason, path) {
+    if (lastShown) { visibleMs += Date.now() - lastShown; lastShown = 0; }
+    var secs = Math.round(visibleMs / 1000);
+    visibleMs = 0;
+    if (secs >= 2) track("time_on_page", { seconds: Math.min(secs, 3600), reason: reason }, path || lastPath);
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") flushTime("hidden");
+    else lastShown = Date.now();
+  });
+  window.addEventListener("pagehide", function () { flushTime("leave"); });
+
+  // Same naming rule as pj-feedback.js, so downloads and ratings line up per file.
+  function fileLabel(t) {
+    var n = t.getAttribute("data-file-name") || t.getAttribute("download");
+    if (n) return n;
+    var href = t.getAttribute("href") || "";
+    if (href && href.charAt(0) !== "#" && href.indexOf("javascript:") !== 0) {
+      var last = href.split("?")[0].split("#")[0].split("/").pop();
+      try { last = decodeURIComponent(last); } catch (e) {}
+      if (last) return last;
+    }
+    return (t.textContent || "").trim().slice(0, 80);
+  }
+  function extOf(name) {
+    var m = /\.([a-z0-9]{1,8})$/i.exec(name || "");
+    return m ? m[1].toLowerCase() : null;
+  }
+
+  var lastQ = "", searchTimer = null;
+  function logSearch(q, count) {
+    q = String(q || "").trim().toLowerCase().slice(0, 80);
+    if (q.length < 2 || q === lastQ) return;
+    lastQ = q;
+    track("search", { q: q, results: typeof count === "number" ? count : null });
+  }
+
+  /* ---------- personalization (stays on this device, works without analytics) ---------- */
+  var PK = "nuasa_pref", RK = "nuasa_recent", MAX_RECENT = 10;
+  function lsGet(k, d) {
+    try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; }
+    catch (e) { return d; }
+  }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+  var pref = {
+    get: function (k, d) { var p = lsGet(PK, {}); return k in p ? p[k] : d; },
+    set: function (k, v) { var p = lsGet(PK, {}); p[k] = v; lsSet(PK, p); }
+  };
+  function fire(list) {
+    try { window.dispatchEvent(new CustomEvent("nuasa:recent", { detail: list })); } catch (e) {}
+  }
+  var recent = {
+    list: function () { return lsGet(RK, []); },
+    add: function (item) {
+      if (!item || !(item.id || item.name)) return;
+      var key = item.id || item.name;
+      var list = recent.list().filter(function (x) { return (x.id || x.name) !== key; });
+      list.unshift({
+        id: item.id || null,
+        name: String(item.name || "").slice(0, 120),
+        url: item.url ? String(item.url).slice(0, 300) : null,
+        t: Date.now()
+      });
+      list = list.slice(0, MAX_RECENT);
+      lsSet(RK, list);
+      fire(list);
+    },
+    clear: function () { try { localStorage.removeItem(RK); } catch (e) {} fire([]); }
+  };
+  function clearPersonal() {
+    try { localStorage.removeItem(PK); } catch (e) {}
+    recent.clear();
   }
 
   /* ---------- banner UI ---------- */
@@ -119,9 +221,9 @@
         '<p class="nc-t">Cookies on NUASA Library</p>' +
         '<p class="nc-p">We use a few essential cookies to keep you signed in. With Accept all, we can improve the library and make learning seamless.</p>' +
         '<div class="nc-opts">' +
-          '<div class="nc-row"><div><b>Essential</b><span>Keeps you signed in and remembers your light or dark mode and saved files. Always on.</span></div>' +
+          '<div class="nc-row"><div><b>Essential</b><span>Keeps you signed in and remembers your light or dark mode, saved files and recently opened files. Always on.</span></div>' +
           '<input type="checkbox" checked disabled aria-label="Essential cookies, always on"></div>' +
-          '<div class="nc-row"><div><b>Analytics</b><span>An anonymous ID and the pages you open, stored only on our own database. Never used for ads.</span></div>' +
+          '<div class="nc-row"><div><b>Analytics</b><span>An anonymous ID, the pages you open, your searches, downloads and time spent on pages, stored only on our own database. Never used for ads.</span></div>' +
           '<input type="checkbox" id="nc-a" aria-label="Analytics cookies"' + (on ? " checked" : "") + "></div>" +
         "</div>" +
         '<div class="nc-btns">' +
@@ -148,7 +250,34 @@
     if (t) { e.preventDefault(); open(); }
   });
 
-  window.addEventListener("hashchange", function () { track("page_view"); });
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest && e.target.closest("a[download],[data-download]");
+    if (t) {
+      var f = fileLabel(t);
+      track("download", { file: f, type: extOf(f) });
+    }
+    var o = e.target.closest && e.target.closest("[data-open]");
+    if (o) {
+      var n = fileLabel(o);
+      var id = o.getAttribute("data-file-id");
+      recent.add({ id: id, name: n, url: o.getAttribute("href") });
+      track("file_open", { file: n, id: id });
+    }
+  });
+
+  document.addEventListener("input", function (e) {
+    var t = e.target;
+    if (!t || !t.matches || !t.matches('input[type="search"],[data-search]')) return;
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function () { logSearch(t.value); }, 1200);
+  });
+
+  window.addEventListener("hashchange", function () {
+    flushTime("nav", lastPath);          // close out the page we just left
+    lastPath = location.pathname + location.hash;
+    if (document.visibilityState === "visible") lastShown = Date.now();
+    track("page_view");
+  });
 
   function start() {
     if (!read()) {
@@ -162,5 +291,8 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
   else start();
 
-  window.NUASAConsent = { open: open, allowed: allowed, track: track };
+  window.NUASAConsent = {
+    open: open, allowed: allowed, track: track, visitorId: vid,
+    pref: pref, recent: recent, clearPersonal: clearPersonal
+  };
 })();
