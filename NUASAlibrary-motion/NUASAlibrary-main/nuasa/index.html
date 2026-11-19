@@ -773,6 +773,8 @@ html{scroll-behavior:smooth}
 .cm .cx{align-self:center;background:none;border:0;color:var(--mut);font-size:12px;cursor:pointer;padding:6px;opacity:.7}.cm .cx:hover{color:var(--r);opacity:1}
 #chat .cf{display:flex;gap:10px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0));border-top:1px solid var(--line);background:var(--card)}#chat .cf .inp{flex:1}
 .apr{display:flex;align-items:center;gap:14px;margin-bottom:14px}.apr .cav{width:64px;height:64px;font-size:20px}
+.cmi{display:block;max-width:100%;max-height:260px;border-radius:10px;margin-top:6px;object-fit:contain}.cm p+a .cmi{margin-top:8px}
+#chat .cf .ib{flex:none;width:46px;height:46px;border:1px solid var(--line);border-radius:10px}
 </style>
 </head>
 <body>
@@ -2539,7 +2541,9 @@ el.id="chat";el.setAttribute("role","dialog");el.setAttribute("aria-label","Stud
 function ava(p,n){if(p&&p.avatar_url)return '<img class="cav" src="'+esc(p.avatar_url)+'" alt="" loading="lazy">';var i=String(n||"Student").trim().split(/\s+/).map(function(w){return w[0]}).slice(0,2).join("").toUpperCase()||"N";return '<span class="cav">'+esc(i)+'</span>'}
 async function need(ids){var m=ids.filter(function(i){return i&&!C.names[i]});if(!m.length)return;var r=await sb.from("profiles").select("id,full_name,avatar_url").in("id",m);(r.data||[]).forEach(function(p){C.names[p.id]=p});m.forEach(function(i){if(!C.names[i])C.names[i]={}})}
 function row(m){var p=C.names[m.user_id]||{},me=S.user&&m.user_id===S.user.id,n=p.full_name||"Student",t=new Date(m.created_at).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
- return '<div class="cm'+(me?" me":"")+'" data-id="'+m.id+'">'+ava(p,n)+'<div class="cb"><div class="cn">'+(me?"You":esc(n))+'<time>'+t+'</time></div><p>'+esc(m.body)+'</p></div>'+(me||isAdmin()?'<button class="cx" data-del="'+m.id+'">Delete</button>':'<button class="cx" data-rep="'+m.id+'">Report</button>')+'</div>'}
+ return '<div class="cm'+(me?" me":"")+'" data-id="'+m.id+'">'+ava(p,n)+'<div class="cb"><div class="cn">'+(me?"You":esc(n))+'<time>'+t+'</time></div>'+(m.body?'<p>'+esc(m.body)+'</p>':'')+med(m.media_url)+'</div>'+(me||isAdmin()?'<button class="cx" data-del="'+m.id+'">Delete</button>':'<button class="cx" data-rep="'+m.id+'">Report</button>')+'</div>'}
+var MP=SU+"/storage/v1/object/public/chat-media/";
+function med(u){return u&&String(u).indexOf(MP)===0?'<a href="'+esc(u)+'" target="_blank" rel="noopener"><img class="cmi" src="'+esc(u)+'" alt="Shared image" loading="lazy"></a>':""}
 var note=function(t){return '<p class="note" style="padding:24px;text-align:center">'+t+'</p>'};
 function add(m){var L=$("#cL");if(!L)return;var e=L.querySelector(".note");if(e)e.remove();var nb=L.scrollHeight-L.scrollTop-L.clientHeight<120||(S.user&&m.user_id===S.user.id);L.insertAdjacentHTML("beforeend",row(m));if(nb)L.scrollTop=L.scrollHeight}
 function unsub(){if(C.ch){try{sb.removeChannel(C.ch)}catch(e){}C.ch=null}}
@@ -2550,10 +2554,16 @@ async function load(){var L=$("#cL"),room=C.room;L.innerHTML=note("Loading...");
  var r=await sb.from("chat_messages").select("*").eq("room",room).order("created_at",{ascending:false}).limit(50);if(room!==C.room)return;
  if(r.error){L.innerHTML=note("Chat is not set up yet. Run nuasa-chat.sql in Supabase.");return}
  var d=(r.data||[]).reverse();await need(d.map(function(m){return m.user_id}));L.innerHTML=d.length?d.map(row).join(""):note("No messages yet. Say hello.");L.scrollTop=L.scrollHeight;sub()}
-function shell(){el.innerHTML='<div class="ch"><h3>Student chat</h3><button class="ib" data-cc aria-label="Close chat">✕</button></div><div class="rt">'+ROOMS.map(function(r){return '<button data-room="'+r[0]+'" class="'+(r[0]===C.room?"on":"")+'">'+r[1]+'</button>'}).join("")+'</div><div id="cL"></div><div class="cf"><input class="inp" id="cI" maxlength="500" placeholder="Write a message" autocomplete="off"><button class="btn p" id="cS">Send</button></div>'}
-async function send(){var i=$("#cI"),v=i.value.trim();if(!v)return;if(Date.now()-C.last<2000)return toast("Slow down a little.");C.last=Date.now();i.value="";
- var r=await sb.from("chat_messages").insert({room:C.room,user_id:S.user.id,body:v.slice(0,500)}).select().single();
+function shell(){el.innerHTML='<div class="ch"><h3>Student chat</h3><button class="ib" data-cc aria-label="Close chat">✕</button></div><div class="rt">'+ROOMS.map(function(r){return '<button data-room="'+r[0]+'" class="'+(r[0]===C.room?"on":"")+'">'+r[1]+'</button>'}).join("")+'</div><div id="cL"></div><div class="cf"><button class="ib" id="cA" aria-label="Attach image or GIF"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg></button><input type="file" id="cFile" accept="image/*" hidden><input class="inp" id="cI" maxlength="500" placeholder="Write a message" autocomplete="off"><button class="btn p" id="cS">Send</button></div>'}
+async function ensure(){if(S.profile)return;try{var n=((S.user.email||"").split("@")[0])||"Student",r=await sb.from("profiles").upsert({id:S.user.id,full_name:n},{onConflict:"id",ignoreDuplicates:true}).select().maybeSingle();if(r.data)S.profile=r.data}catch(e){}}
+async function send(mu){var i=$("#cI"),v=i.value.trim();if(!v&&!mu)return;if(Date.now()-C.last<2000)return toast("Slow down a little.");C.last=Date.now();i.value="";await ensure();
+ var o={room:C.room,user_id:S.user.id,body:v.slice(0,500)};if(mu)o.media_url=mu;var r=await sb.from("chat_messages").insert(o).select().single();
  if(r.error){i.value=v;return toast(/policy|slow/i.test(r.error.message)?"You can't post right now.":r.error.message)}await need([S.user.id]);add(r.data)}
+function fit(f){return new Promise(function(ok,no){var u=URL.createObjectURL(f),im=new Image();im.onload=function(){var k=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(function(b){b?ok(b):no(new Error("Could not read that image."))},"image/jpeg",.82)};im.onerror=function(){no(new Error("Could not read that image."))};im.src=u})}
+async function pick(file){if(!file)return;if(!/^image\//.test(file.type))return toast("Choose an image or GIF.");var gif=file.type==="image/gif";if(gif&&file.size>5*1024*1024)return toast("GIFs must be under 5 MB.");
+ if(Date.now()-C.last<2000)return toast("Slow down a little.");toast("Uploading...");
+ try{var blob=gif?file:await fit(file),path=S.user.id+"/"+Date.now()+"."+(gif?"gif":"jpg"),u=await sb.storage.from("chat-media").upload(path,blob,{contentType:gif?"image/gif":"image/jpeg",cacheControl:"31536000"});
+  if(u.error)throw u.error;await send(sb.storage.from("chat-media").getPublicUrl(path).data.publicUrl)}catch(x){toast(x.message||"Upload failed.")}}
 function close(){el.classList.remove("on");document.body.style.overflow="";unsub()}
 window.openChat=function(){if(!S.user||!sb){toast("Sign in to join the chat.");$("#authBtn").click();return}
  shell();el.classList.add("on");document.body.style.overflow="hidden";load();setTimeout(function(){var i=$("#cI");if(i)i.focus()},50)};
@@ -2561,8 +2571,10 @@ el.addEventListener("click",async function(e){var b=e.target.closest("button");i
  if(b.hasAttribute("data-cc"))return close();
  if(b.dataset.room){C.room=b.dataset.room;el.querySelectorAll(".rt button").forEach(function(x){x.classList.toggle("on",x===b)});return load()}
  if(b.id==="cS")return send();
- if(b.dataset.del){if(!confirm("Delete this message?"))return;var r=await sb.from("chat_messages").delete().eq("id",b.dataset.del);if(r.error)return toast(r.error.message);var x=$('#cL [data-id="'+b.dataset.del+'"]');if(x)x.remove();return}
+ if(b.id==="cA")return $("#cFile").click();
+ if(b.dataset.del){if(!confirm("Delete this message?"))return;var im=$('#cL [data-id="'+b.dataset.del+'"] .cmi'),pp=im&&im.src.split("/chat-media/")[1],r=await sb.from("chat_messages").delete().eq("id",b.dataset.del);if(r.error)return toast(r.error.message);if(pp)sb.storage.from("chat-media").remove([decodeURIComponent(pp.split("?")[0])]);var x=$('#cL [data-id="'+b.dataset.del+'"]');if(x)x.remove();return}
  if(b.dataset.rep){var q=await sb.from("chat_reports").insert({message_id:+b.dataset.rep,reporter:S.user.id});toast(q.error&&!/duplicate/i.test(q.error.message)?q.error.message:"Reported. An admin will review it.")}});
+el.addEventListener("change",function(e){if(e.target.id==="cFile"){var f=e.target.files[0];e.target.value="";pick(f)}});
 el.addEventListener("keydown",function(e){if(e.target.id==="cI"&&e.key==="Enter"){e.preventDefault();send()}});
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&el.classList.contains("on"))close()});
 $("#dChat").onclick=function(e){e.preventDefault();if(typeof od==="function")od(false);openChat()};
