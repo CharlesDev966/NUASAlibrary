@@ -761,6 +761,18 @@ html{scroll-behavior:smooth}
   *,*:before,*:after{animation:none!important;transition:none!important}
   .js .rv{opacity:1;transform:none}
 }
+#chat{position:fixed;inset:0;z-index:120;background:var(--bg);display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0)}#chat.on{display:flex}
+#chat .ch{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--card)}#chat .ch h3{font:700 20px var(--d);letter-spacing:-.02em;flex:1}
+#chat .rt{display:flex;gap:8px;overflow-x:auto;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--card)}
+#chat .rt button{flex:none;height:34px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--sub);color:var(--fg);font:600 14px var(--b);cursor:pointer}#chat .rt button.on{background:var(--g);color:#04130a;border-color:var(--g)}
+#cL{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;max-width:760px;width:100%;margin:0 auto}
+.cm{display:flex;gap:10px;align-items:flex-start}.cm.me{flex-direction:row-reverse}
+.cav{width:34px;height:34px;border-radius:50%;flex:none;object-fit:cover;background:var(--g);color:#04130a;display:grid;place-items:center;font:800 13px var(--d)}
+.cm .cb{max-width:min(78%,520px);background:var(--sub);border:1px solid var(--line);border-radius:14px;padding:8px 12px}.cm.me .cb{background:var(--glow);border-color:var(--g)}
+.cm .cn{font:700 13px var(--d);margin-bottom:2px}.cm time{font-weight:400;color:var(--mut);margin-left:6px;font-size:12px}.cm p{font-size:15px;line-height:1.4;overflow-wrap:anywhere;white-space:pre-wrap}
+.cm .cx{align-self:center;background:none;border:0;color:var(--mut);font-size:12px;cursor:pointer;padding:6px;opacity:.7}.cm .cx:hover{color:var(--r);opacity:1}
+#chat .cf{display:flex;gap:10px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0));border-top:1px solid var(--line);background:var(--card)}#chat .cf .inp{flex:1}
+.apr{display:flex;align-items:center;gap:14px;margin-bottom:14px}.apr .cav{width:64px;height:64px;font-size:20px}
 </style>
 </head>
 <body>
@@ -779,6 +791,7 @@ html{scroll-behavior:smooth}
   <a href="#nlm" class="mi big" title="AI study notebooks for your courses"><i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16v4M17 18h4"/></svg></i><span>NotebookLM</span></a>
   <a href="#classes" class="mi big" title="ATS, ICAN and CITN study centers"><i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M10 9.5v4l3.5-2z"/><path d="M8 21h8"/></svg></i><span>Professional Certifications</span></a>
   <a href="#" class="mi big" id="dPj" title="Topic ideas and full project drafts"><i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></i><span>Project AI</span></a>
+  <a href="#" class="mi big" id="dChat" title="Talk with other students"><i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14.5h4"/></svg></i><span>Student Chat</span></a>
   <div class="mgap"></div>
   <p class="mh">Explore</p>
   <a href="#top" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg><span>Home</span></a><a href="#opps" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"/></svg><span>Opportunities</span></a><a href="#courses" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg><span>Masterclasses</span></a><a href="#how" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span>How it works</span></a><a href="#faq" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5M12 17h.01"/></svg><span>FAQ</span></a>
@@ -2149,6 +2162,8 @@ const ET=[
  {k:"opportunities",g:"Content",l:"Opportunities",one:"opportunity",t:"opportunities",o:"created_at"},
  {k:"cbt_questions",g:"Content",l:"CBT questions",one:"question",t:"cbt_questions",o:"created_at"},
  {k:"cbt_reports",g:"Content",l:"CBT error reports",one:"report",t:"cbt_reports",o:"created_at",c:["course_code","question","note","created_at"]},
+ {k:"chat_messages",g:"People",l:"Chat messages",one:"message",t:"chat_messages",o:"created_at",c:["room","body","user_id","created_at"],s:["body"]},
+ {k:"chat_reports",g:"People",l:"Chat reports",one:"report",t:"chat_reports",o:"created_at",c:["message_id","reporter","created_at"]},
  {k:"profiles",g:"People",l:"Users",one:"user",t:"profiles",o:"created_at",users:1}];
 const E={cur:"home",st:{},tmp:[],counts:{}};
 const eRO=k=>/^(id|created_at|updated_at|created_by|uploaded_by|user_id)$/.test(k),
@@ -2517,6 +2532,54 @@ const sel=".card,.cc,#crg article,.lv>*,.demo,.rr";
 document.addEventListener("pointermove",e=>{const t=e.target.closest&&e.target.closest(sel);if(!t)return;const r=t.getBoundingClientRect();t.style.setProperty("--mx",(e.clientX-r.left)+"px");t.style.setProperty("--my",(e.clientY-r.top)+"px")},{passive:true});
 const up=()=>{const h=document.documentElement,m=h.scrollHeight-h.clientHeight;sp.style.width=(m>0?h.scrollTop/m*100:0)+"%"};addEventListener("scroll",up,{passive:true});up()})();
 </script>
+<script id="chat-js">
+(function(){
+var ROOMS=[["general","General"],["100","100L"],["200","200L"],["300","300L"],["400","400L"]],C={room:"general",ch:null,names:{},last:0},el=document.createElement("div");
+el.id="chat";el.setAttribute("role","dialog");el.setAttribute("aria-label","Student chat");document.body.appendChild(el);
+function ava(p,n){if(p&&p.avatar_url)return '<img class="cav" src="'+esc(p.avatar_url)+'" alt="" loading="lazy">';var i=String(n||"Student").trim().split(/\s+/).map(function(w){return w[0]}).slice(0,2).join("").toUpperCase()||"N";return '<span class="cav">'+esc(i)+'</span>'}
+async function need(ids){var m=ids.filter(function(i){return i&&!C.names[i]});if(!m.length)return;var r=await sb.from("profiles").select("id,full_name,avatar_url").in("id",m);(r.data||[]).forEach(function(p){C.names[p.id]=p});m.forEach(function(i){if(!C.names[i])C.names[i]={}})}
+function row(m){var p=C.names[m.user_id]||{},me=S.user&&m.user_id===S.user.id,n=p.full_name||"Student",t=new Date(m.created_at).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
+ return '<div class="cm'+(me?" me":"")+'" data-id="'+m.id+'">'+ava(p,n)+'<div class="cb"><div class="cn">'+(me?"You":esc(n))+'<time>'+t+'</time></div><p>'+esc(m.body)+'</p></div>'+(me||isAdmin()?'<button class="cx" data-del="'+m.id+'">Delete</button>':'<button class="cx" data-rep="'+m.id+'">Report</button>')+'</div>'}
+var note=function(t){return '<p class="note" style="padding:24px;text-align:center">'+t+'</p>'};
+function add(m){var L=$("#cL");if(!L)return;var e=L.querySelector(".note");if(e)e.remove();var nb=L.scrollHeight-L.scrollTop-L.clientHeight<120||(S.user&&m.user_id===S.user.id);L.insertAdjacentHTML("beforeend",row(m));if(nb)L.scrollTop=L.scrollHeight}
+function unsub(){if(C.ch){try{sb.removeChannel(C.ch)}catch(e){}C.ch=null}}
+function sub(){unsub();C.ch=sb.channel("chat-"+C.room)
+ .on("postgres_changes",{event:"INSERT",schema:"public",table:"chat_messages",filter:"room=eq."+C.room},async function(e){var m=e.new;if($('#cL [data-id="'+m.id+'"]'))return;await need([m.user_id]);if($('#cL [data-id="'+m.id+'"]'))return;add(m)})
+ .on("postgres_changes",{event:"DELETE",schema:"public",table:"chat_messages"},function(e){var x=$('#cL [data-id="'+e.old.id+'"]');if(x)x.remove()}).subscribe()}
+async function load(){var L=$("#cL"),room=C.room;L.innerHTML=note("Loading...");
+ var r=await sb.from("chat_messages").select("*").eq("room",room).order("created_at",{ascending:false}).limit(50);if(room!==C.room)return;
+ if(r.error){L.innerHTML=note("Chat is not set up yet. Run nuasa-chat.sql in Supabase.");return}
+ var d=(r.data||[]).reverse();await need(d.map(function(m){return m.user_id}));L.innerHTML=d.length?d.map(row).join(""):note("No messages yet. Say hello.");L.scrollTop=L.scrollHeight;sub()}
+function shell(){el.innerHTML='<div class="ch"><h3>Student chat</h3><button class="ib" data-cc aria-label="Close chat">✕</button></div><div class="rt">'+ROOMS.map(function(r){return '<button data-room="'+r[0]+'" class="'+(r[0]===C.room?"on":"")+'">'+r[1]+'</button>'}).join("")+'</div><div id="cL"></div><div class="cf"><input class="inp" id="cI" maxlength="500" placeholder="Write a message" autocomplete="off"><button class="btn p" id="cS">Send</button></div>'}
+async function send(){var i=$("#cI"),v=i.value.trim();if(!v)return;if(Date.now()-C.last<2000)return toast("Slow down a little.");C.last=Date.now();i.value="";
+ var r=await sb.from("chat_messages").insert({room:C.room,user_id:S.user.id,body:v.slice(0,500)}).select().single();
+ if(r.error){i.value=v;return toast(/policy|slow/i.test(r.error.message)?"You can't post right now.":r.error.message)}await need([S.user.id]);add(r.data)}
+function close(){el.classList.remove("on");document.body.style.overflow="";unsub()}
+window.openChat=function(){if(!S.user||!sb){toast("Sign in to join the chat.");$("#authBtn").click();return}
+ shell();el.classList.add("on");document.body.style.overflow="hidden";load();setTimeout(function(){var i=$("#cI");if(i)i.focus()},50)};
+el.addEventListener("click",async function(e){var b=e.target.closest("button");if(!b)return;
+ if(b.hasAttribute("data-cc"))return close();
+ if(b.dataset.room){C.room=b.dataset.room;el.querySelectorAll(".rt button").forEach(function(x){x.classList.toggle("on",x===b)});return load()}
+ if(b.id==="cS")return send();
+ if(b.dataset.del){if(!confirm("Delete this message?"))return;var r=await sb.from("chat_messages").delete().eq("id",b.dataset.del);if(r.error)return toast(r.error.message);var x=$('#cL [data-id="'+b.dataset.del+'"]');if(x)x.remove();return}
+ if(b.dataset.rep){var q=await sb.from("chat_reports").insert({message_id:+b.dataset.rep,reporter:S.user.id});toast(q.error&&!/duplicate/i.test(q.error.message)?q.error.message:"Reported. An admin will review it.")}});
+el.addEventListener("keydown",function(e){if(e.target.id==="cI"&&e.key==="Enter"){e.preventDefault();send()}});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&el.classList.contains("on"))close()});
+$("#dChat").onclick=function(e){e.preventDefault();if(typeof od==="function")od(false);openChat()};
+/* ---- profile photo ---- */
+function rs(f){return new Promise(function(ok,no){var u=URL.createObjectURL(f),im=new Image();im.onload=function(){var s=Math.min(im.width,im.height),c=document.createElement("canvas");c.width=c.height=256;c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,256,256);URL.revokeObjectURL(u);c.toBlob(function(b){b?ok(b):no(new Error("Could not read that image."))},"image/jpeg",.85)};im.onerror=function(){no(new Error("Could not read that image."))};im.src=u})}
+var _ma=menuAcct;window.menuAcct=function(){_ma();var a=document.querySelector("#mAcct .av");if(a&&S.profile&&S.profile.avatar_url)a.innerHTML='<img src="'+esc(S.profile.avatar_url)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'};menuAcct();
+var _op=openProfile;window.openProfile=function(){_op();var f=document.querySelector("#md .form");if(!f||!$("#epGo")||!S.user)return;var n=(S.profile&&S.profile.full_name)||"Student";
+ f.insertAdjacentHTML("afterbegin",'<div class="apr"><div id="apV">'+ava(S.profile,n)+'</div><div><label class="btn s" style="cursor:pointer;height:38px">Change photo<input id="apF" type="file" accept="image/*" hidden></label><p class="note" style="margin-top:6px">We crop it square.</p></div></div>');
+ $("#apF").onchange=async function(){var file=this.files[0];if(!file)return;if(!/^image\//.test(file.type))return toast("Choose an image file.");
+  try{var b=await rs(file),path=S.user.id+"/avatar.jpg",u=await sb.storage.from("avatars").upload(path,b,{contentType:"image/jpeg",upsert:true,cacheControl:"3600"});if(u.error)throw u.error;
+   var url=sb.storage.from("avatars").getPublicUrl(path).data.publicUrl+"?v="+Date.now(),r=await sb.from("profiles").update({avatar_url:url}).eq("id",S.user.id).select().maybeSingle();if(r.error)throw r.error;
+   if(!r.data){r=await sb.from("profiles").insert({id:S.user.id,full_name:n,avatar_url:url}).select().maybeSingle();if(r.error)throw r.error}
+   S.profile=Object.assign({},S.profile||{},{avatar_url:url});C.names[S.user.id]=Object.assign({},C.names[S.user.id],{avatar_url:url});$("#apV").innerHTML=ava(S.profile,n);menuAcct();toast("Photo updated.")}
+  catch(x){toast(x.message||"Could not upload the photo.")}}};
+})();
+</script>
+
 <script id="motion-js">
 (function(){
 var h=document.documentElement;h.classList.add("js");               /* content stays visible if JS fails */
