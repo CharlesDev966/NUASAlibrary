@@ -1429,7 +1429,7 @@ async function upFile(path,file,onPct){
 }
 const TY={past_question:"Past question",lecture_note:"Lecture note",textbook:"Textbook",handout:"Handout",assignment:"Assignment",video:"Video"};
 const S={res:[],user:null,profile:null,fullAccess:false},isAdmin=()=>S.profile&&S.profile.role==="admin";
-const sb=window.supabase?supabase.createClient(SU,SK,{auth:{lock:async(n,t,f)=>await f()}}):null;
+const sb=window.supabase?supabase.createClient(SU,SK,{auth:{lock:async(n,t,f)=>await f()}}):null;window.NUASA_SB=sb;
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fs=b=>!b?"":b>1048576?(b/1048576).toFixed(1)+" MB":Math.max(1,Math.round(b/1024))+" KB";
 const sessions=()=>{const y=new Date().getFullYear();return Array.from({length:9},(_,i)=>`${y-i}/${y-i+1}`)};
@@ -2557,4 +2557,5 @@ if(m&&"MutationObserver" in window)new MutationObserver(dyn).observe(m,{childLis
 dyn();
 })();
 </script>
+<script src="/pj-consent.js" defer></script>
 </body></html>
