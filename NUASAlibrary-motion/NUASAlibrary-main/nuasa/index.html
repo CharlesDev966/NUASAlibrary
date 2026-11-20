@@ -637,6 +637,7 @@ footer{border-top:1px solid color-mix(in srgb,var(--g) 18%,var(--line));backgrou
 :root[data-theme="light"] #drawer .sw{background:var(--g)}
 #drawer .mft{margin:18px 14px 0;padding:16px 12px calc(env(safe-area-inset-bottom,0px) + 6px);border-top:1px solid var(--mline);font-size:12px;line-height:1.5;color:var(--mmut)}
 @media(prefers-reduced-motion:reduce){#drawer.open nav .mi.big{animation:none}#drawer nav .mi .ic,#drawer nav .mi{transition:none}}
+.air{display:flex;flex-direction:column;align-items:center;gap:16px}.air canvas{width:100%;height:auto;display:block;border-radius:12px;background:#0d0e10}.airb{width:48px;height:48px;border-radius:50%;border:0;background:#fff;color:#111;display:grid;place-items:center;cursor:pointer;transition:transform .2s,opacity .2s}.airb svg{width:20px;height:20px}.airb:disabled{opacity:.4;cursor:default}.airb:not(:disabled):active{transform:scale(.92)}[data-theme=light] .airb{background:#17181a;color:#fff}
 </style><script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script>tailwind.config={prefix:"tw-",corePlugins:{preflight:false},theme:{extend:{colors:{card:"var(--card)",sub:"var(--sub)",line:"var(--line)",mut:"var(--mut)",brand:"var(--g)"},fontFamily:{display:["var(--d)"]}}}}</script>
 <style id="sub-css">
@@ -761,20 +762,6 @@ html{scroll-behavior:smooth}
   *,*:before,*:after{animation:none!important;transition:none!important}
   .js .rv{opacity:1;transform:none}
 }
-#chat{position:fixed;inset:0;z-index:120;background:var(--bg);display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0)}#chat.on{display:flex}
-#chat .ch{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--card)}#chat .ch h3{font:700 20px var(--d);letter-spacing:-.02em;flex:1}
-#chat .rt{display:flex;gap:8px;overflow-x:auto;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--card)}
-#chat .rt button{flex:none;height:34px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--sub);color:var(--fg);font:600 14px var(--b);cursor:pointer}#chat .rt button.on{background:var(--g);color:#04130a;border-color:var(--g)}
-#cL{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;max-width:760px;width:100%;margin:0 auto}
-.cm{display:flex;gap:10px;align-items:flex-start}.cm.me{flex-direction:row-reverse}
-.cav{width:34px;height:34px;border-radius:50%;flex:none;object-fit:cover;background:var(--g);color:#04130a;display:grid;place-items:center;font:800 13px var(--d)}
-.cm .cb{max-width:min(78%,520px);background:var(--sub);border:1px solid var(--line);border-radius:14px;padding:8px 12px}.cm.me .cb{background:var(--glow);border-color:var(--g)}
-.cm .cn{font:700 13px var(--d);margin-bottom:2px}.cm time{font-weight:400;color:var(--mut);margin-left:6px;font-size:12px}.cm p{font-size:15px;line-height:1.4;overflow-wrap:anywhere;white-space:pre-wrap}
-.cm .cx{align-self:center;background:none;border:0;color:var(--mut);font-size:12px;cursor:pointer;padding:6px;opacity:.7}.cm .cx:hover{color:var(--r);opacity:1}
-#chat .cf{display:flex;gap:10px;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0));border-top:1px solid var(--line);background:var(--card)}#chat .cf .inp{flex:1}
-.apr{display:flex;align-items:center;gap:14px;margin-bottom:14px}.apr .cav{width:64px;height:64px;font-size:20px}
-.cmi{display:block;max-width:100%;max-height:260px;border-radius:10px;margin-top:6px;object-fit:contain}.cm p+a .cmi{margin-top:8px}
-#chat .cf .ib{flex:none;width:46px;height:46px;border:1px solid var(--line);border-radius:10px}
 </style>
 </head>
 <body>
@@ -793,7 +780,7 @@ html{scroll-behavior:smooth}
   <a href="#nlm" class="mi big" title="AI study notebooks for your courses"><i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16v4M17 18h4"/></svg></i><span>NotebookLM</span></a>
   <a href="#classes" class="mi big" title="ATS, ICAN and CITN study centers"><i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M10 9.5v4l3.5-2z"/><path d="M8 21h8"/></svg></i><span>Professional Certifications</span></a>
   <a href="#" class="mi big" id="dPj" title="Topic ideas and full project drafts"><i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></i><span>Project AI</span></a>
-  <a href="#" class="mi big" id="dChat" title="Talk with other students"><i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14.5h4"/></svg></i><span>Student Chat</span></a>
+  <a href="#" class="mi big" id="dChat" title="Chat with other students"><i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11.5h7M8.5 14.5h4"/></svg></i><span>Student Chat</span><em class="bdg">Soon</em></a>
   <div class="mgap"></div>
   <p class="mh">Explore</p>
   <a href="#top" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg><span>Home</span></a><a href="#opps" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"/></svg><span>Opportunities</span></a><a href="#courses" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg><span>Masterclasses</span></a><a href="#how" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span>How it works</span></a><a href="#faq" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5M12 17h.01"/></svg><span>FAQ</span></a>
@@ -1458,9 +1445,9 @@ function files(id){const c=C.find(x=>x[4]===id),L=S.res.filter(r=>r.course_id===
  openModal(mh(esc(c[0]),esc(c[1]))+'<div class="mg">'+N.map(n=>`<div class="rr"><div style="flex:1;min-width:0"><div style="font-weight:600">${esc(n.title)}</div><div class="note">NotebookLM</div></div><a class="btn s" style="height:38px" target="_blank" rel="noopener" href="${esc(n.notebook_url)}">Open notebook</a></div>`).join("")+
  (L.length?L.map(r=>rrow(r)).join(""):`<p class="mut" style="margin:18px 0">No files for this course yet. Be the first to share one.</p>`)+'</div>'+`<button class="btn s" data-up style="width:100%;margin-top:16px" onclick="closeModal()">Upload a resource</button>`,1)}
 function pv(id){const r=S.res.find(x=>x.id===id),u=r&&url(r);if(!u)return toast("This file is unavailable.");if(!navigator.onLine){if(offHas(id))return offOpen(id);return toast("You are offline. Previews need internet.")}const e=ext(r),c=cn(r.course_id);
- const f=["png","jpg","jpeg"].includes(e)?`<img src="${esc(u)}" alt="" style="width:100%;border-radius:12px">`:e==="pdf"?'<div id="pvPdf" class="pvdoc"><div class="note pvld">Loading preview…</div></div>':e==="docx"?'<div id="pvDocx" class="pvdoc pvw"><div class="note pvld">Loading preview…</div></div>':["doc","ppt","pptx","xls","xlsx"].includes(e)?gviewHtml(u):`<p class="mut" style="padding:30px 0">No preview is available for this file type. Download it to open it.</p>`;
+ const f=["png","jpg","jpeg"].includes(e)?'<div id="pvImg" class="air"><div class="note pvld">Loading preview…</div></div>':e==="pdf"?'<div id="pvPdf" class="pvdoc"><div class="note pvld">Loading preview…</div></div>':e==="docx"?'<div id="pvDocx" class="pvdoc pvw"><div class="note pvld">Loading preview…</div></div>':["doc","ppt","pptx","xls","xlsx"].includes(e)?gviewHtml(u):`<p class="mut" style="padding:30px 0">No preview is available for this file type. Download it to open it.</p>`;
  openModal(mh(esc(r.title),esc(c[0]||""))+`<div style="margin-top:16px">${f}</div><div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><button class="btn p" onclick="get('${esc(r.id)}')">Download</button><button class="btn s" onclick="offToggle('${esc(r.id)}')">${offHas(r.id)?"Remove offline":"Save offline"}</button><a class="btn s" href="${esc(u)}" target="_blank" rel="noopener">Open in new tab</a>${c[4]?`<button class="btn s" onclick="files('${esc(c[4])}')">Back to files</button>`:""}</div>`,true);
- if(e==="pdf")pvPdf($("#pvPdf"),u);else if(e==="docx")pvDocx($("#pvDocx"),u)}
+ if(e==="pdf")pvPdf($("#pvPdf"),u);else if(e==="docx")pvDocx($("#pvDocx"),u);else if(["png","jpg","jpeg"].includes(e))pvReveal($("#pvImg"),u)}
 async function get(id){const r=S.res.find(x=>x.id===id),u=r&&url(r);if(!u)return toast("This file is unavailable.");
  if(!r.external_url){if(offHas(id)&&await offOpen(id))return;if(!navigator.onLine)return toast("You are offline. Save files while you have internet to read them later.")}
  if(r.external_url)window.open(u,"_blank","noopener");else{try{const b=await(await fetch(u)).blob(),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=r.title.replace(/[^\w\- ]+/g,"").trim()+"."+ext(r);document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5e3);toast("Download started.")}catch(e){window.open(u,"_blank","noopener")}}
@@ -1994,6 +1981,7 @@ $("#pjp").addEventListener("click",e=>{const t=e.target,c=s=>t.closest(s);let b;
  if(b=c("[data-sv]")){const id=b.dataset.sv,v=($("#pjTa").value||"").trim();if(v){PJ.parts[id]=v;pjSave()}PJ.edit=null;pjSec(id);return}
  if(c("[data-cn]")){const id=PJ.edit;PJ.edit=null;if(id)pjSec(id);return}});
 $("#dPj").onclick=e=>{e.preventDefault();if(typeof od==="function")od(false);pjOpen()};
+$("#dChat").onclick=e=>{e.preventDefault();if(typeof od==="function")od(false);openModal(mh("Student Chat","Talk with other accounting students")+'<div style="text-align:center;padding:34px 8px 26px"><div style="font-size:44px;line-height:1">💬</div><h2 style="margin:16px 0 8px;font-size:30px">Coming soon</h2><p class="mut" style="max-width:320px;margin:0 auto">Student Chat is on its way. Soon you will be able to ask questions and share study tips with students across every level.</p></div><button class="btn s" style="width:100%" onclick="closeModal()">Got it</button>')};
 
 
 /* ---------- Home feed, file manager, offline files ---------- */
@@ -2033,6 +2021,62 @@ async function thumbBlob(src,e){const W=480;
 /* makes the thumbnail and stores it in the bucket next to the file; returns its path, or null (never throws) */
 async function mkThumb(path,src,e,upsert){try{const b=await thumbBlob(src,e);if(!b)return null;const tp=thumbPathOf(path),{error}=await sb.storage.from(BUCKET).upload(tp,b,{contentType:"image/jpeg",cacheControl:"31536000",upsert:!!upsert});return error?null:tp}catch(x){return null}}
 async function insRes(row){let r=await sb.from("resources").insert(row);if(r.error&&"thumb_path" in row&&/thumb_path/.test(r.error.message||"")){delete row.thumb_path;r=await sb.from("resources").insert(row)}return r}
+/* ---------- AI image reveal for the image preview tab ----------
+   1) a particle cloud gathers into the picture as a coloured mosaic
+   2) the mosaic flickers with noise
+   3) the noise clears and the blocks sharpen into the real image
+   The round button replays it. Falls back to a plain <img> if the image can't be read. */
+function pvReveal(box,u){if(!box)return;
+ const plain=()=>{if(box.isConnected)box.innerHTML=`<img src="${esc(u)}" alt="" style="width:100%;border-radius:12px">`};
+ const im=new Image();im.crossOrigin="anonymous";im.onerror=plain;
+ im.onload=()=>{try{
+  const nw=im.naturalWidth,nh=im.naturalHeight;if(!nw||!nh)return plain();
+  const W=Math.max(200,Math.min(box.clientWidth||320,760)),H=Math.round(W*nh/nw),dpr=Math.min(window.devicePixelRatio||1,2);
+  const cv=document.createElement("canvas");cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+  const cx=cv.getContext("2d");cx.scale(dpr,dpr);
+  const cell=Math.max(6,Math.round(W/44)),cols=Math.ceil(W/cell),rows=Math.ceil(H/cell),N=cols*rows;
+  /* sample one colour per mosaic cell */
+  const sm=document.createElement("canvas");sm.width=cols;sm.height=rows;
+  const sc=sm.getContext("2d");sc.drawImage(im,0,0,cols,rows);
+  const px=sc.getImageData(0,0,cols,rows).data;           /* throws if the image is cross-origin and blocked */
+  const P=[],g=()=>(Math.random()+Math.random()+Math.random()-1.5)/1.5;
+  for(let i=0;i<N;i++){const c=i%cols,r=(i/cols)|0;
+   P.push({tx:(c+.5)*cell,ty:(r+.5)*cell,sx:W/2+g()*W*.55,sy:H/2+g()*H*.55,d:Math.random()*.4,R:px[i*4],G:px[i*4+1],B:px[i*4+2]})}
+  const tiny=document.createElement("canvas"),tc=tiny.getContext("2d");
+  const GATHER=1800,NOISE=500,RESOLVE=1500,ease=p=>1-Math.pow(1-p,3),cl=v=>Math.max(0,Math.min(255,v));
+  let raf=0,t0=0,jt=0,jit=null;
+  const btn=document.createElement("button");btn.type="button";btn.className="airb";btn.setAttribute("aria-label","Replay reveal");
+  btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>';
+  box.innerHTML="";box.classList.add("air");box.appendChild(cv);box.appendChild(btn);
+  const done=()=>{cx.imageSmoothingEnabled=true;cx.drawImage(im,0,0,W,H);btn.disabled=false};
+  function frame(now){
+   if(!box.isConnected)return;
+   const t=now-t0;cx.fillStyle="#0d0e10";cx.fillRect(0,0,W,H);
+   if(t<GATHER){                                            /* 1. cloud gathers */
+    for(const p of P){const e=ease(Math.max(0,Math.min(1,(t/GATHER-p.d)/(1-p.d))));
+     const x=p.sx+(p.tx-p.sx)*e,y=p.sy+(p.ty-p.sy)*e,s=2+(cell-2)*e;
+     cx.globalAlpha=.35+.65*e;cx.fillStyle=`rgb(${p.R},${p.G},${p.B})`;cx.fillRect(x-s/2,y-s/2,s,s)}
+    cx.globalAlpha=1}
+   else if(t<GATHER+NOISE){                                 /* 2. noisy mosaic */
+    if(!jit||now-jt>80){jt=now;jit=P.map(()=>(Math.random()-.5)*110)}
+    P.forEach((p,i)=>{const j=jit[i];cx.fillStyle=`rgb(${cl(p.R+j)|0},${cl(p.G+j)|0},${cl(p.B+j)|0})`;cx.fillRect(p.tx-cell/2,p.ty-cell/2,cell+1,cell+1)})}
+   else{                                                    /* 3. resolve to sharp */
+    const u=Math.min(1,(t-GATHER-NOISE)/RESOLVE);
+    if(u>=1)return done();
+    const b=Math.max(1,cell*Math.pow(1-u,2.2));
+    tiny.width=Math.max(1,Math.ceil(W/b));tiny.height=Math.max(1,Math.ceil(H/b));
+    tc.drawImage(im,0,0,tiny.width,tiny.height);
+    cx.imageSmoothingEnabled=false;cx.drawImage(tiny,0,0,tiny.width,tiny.height,0,0,W,H);
+    const sp=Math.round(260*(1-u));                         /* fading speckle */
+    for(let k=0;k<sp;k++){cx.fillStyle=Math.random()<.5?"rgba(255,255,255,.22)":"rgba(0,0,0,.22)";
+     cx.fillRect(Math.random()*W,Math.random()*H,cell*.6,cell*.6)}}
+   raf=requestAnimationFrame(frame)}
+  function play(){cancelAnimationFrame(raf);btn.disabled=true;jit=null;
+   if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches){done();return}
+   t0=performance.now();raf=requestAnimationFrame(frame)}
+  btn.onclick=play;play();
+ }catch(err){plain()}};
+ im.src=u}
 /* enlarged PDF preview: rendered here, page by page, with range requests, so page 1 shows almost at once */
 async function pvPdf(box,u){if(!box)return;
  try{const lib=await pvLoad(),doc=await lib.getDocument({url:u,rangeChunkSize:131072}).promise,w=Math.max(280,box.clientWidth-16),dpr=Math.min(window.devicePixelRatio||1,2),n=Math.min(doc.numPages,40);
@@ -2164,8 +2208,6 @@ const ET=[
  {k:"opportunities",g:"Content",l:"Opportunities",one:"opportunity",t:"opportunities",o:"created_at"},
  {k:"cbt_questions",g:"Content",l:"CBT questions",one:"question",t:"cbt_questions",o:"created_at"},
  {k:"cbt_reports",g:"Content",l:"CBT error reports",one:"report",t:"cbt_reports",o:"created_at",c:["course_code","question","note","created_at"]},
- {k:"chat_messages",g:"People",l:"Chat messages",one:"message",t:"chat_messages",o:"created_at",c:["room","body","user_id","created_at"],s:["body"]},
- {k:"chat_reports",g:"People",l:"Chat reports",one:"report",t:"chat_reports",o:"created_at",c:["message_id","reporter","created_at"]},
  {k:"profiles",g:"People",l:"Users",one:"user",t:"profiles",o:"created_at",users:1}];
 const E={cur:"home",st:{},tmp:[],counts:{}};
 const eRO=k=>/^(id|created_at|updated_at|created_by|uploaded_by|user_id)$/.test(k),
@@ -2448,7 +2490,7 @@ function rvList(i){const c=COURSES[i],r=RV[c.pl]||[],a=rvAgg(c.pl),el=g("cpRv");
 let cpRate=0;
 function crPageClose(back){const p=g("cpg");if(!p)return;p.remove();document.body.style.overflow="";if(back&&location.hash.indexOf("#course-")===0)history.back()}
 function crPage(i){crPageClose();const c=COURSES[i],x=CRX[c.code]||{},o=ul().some(k=>k.indexOf(c.pl+"@")===0),t=esc2(c.t);cpRate=0;
- const tl=c.mods.reduce((a,m)=>a+m.t.length,0),lv=c.mods.reduce((a,m)=>a+lvOf(m),0),dur=x.dur||[],pv=[];
+ const tl=c.mods.reduce((a,m)=>a+m.t.length,0),lv=c.mods.reduce((a,m)=>a+lvOf(m),0),dur=x.dur||[],pv=c.vids?(x.preview||[]):[];
  const mins=dur.reduce((a,d)=>{const p=d.split(":");return a+(+p[0])*60+(+p[1])},0),vt=mins?Math.round(mins/60)+" min":"";
  let off=0;const mods=c.mods.map((m,mi)=>{const base=off,l=lvOf(m);off+=l;
   return '<details class="cpM" '+(mi===0?"open":"")+'><summary><span>'+esc2(m.n)+'</span><em>'+m.t.length+' lessons</em></summary><ul>'+m.t.map((ls,k)=>{const live=k<l,vi=base+k,ic=live?'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M10 9l4 2.5-4 2.5z"/></svg>':'<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
@@ -2480,7 +2522,7 @@ function crPage(i){crPageClose();const c=COURSES[i],x=CRX[c.code]||{},o=ul().som
   if(b.dataset.back){e.preventDefault();crPageClose(true);return}
   if(b.dataset.buy){crPageClose(true);setTimeout(()=>crPay(i),60);return}
   if(b.dataset.go){crPageClose(true);setTimeout(()=>{const a=g("crg");if(a)a.scrollIntoView({behavior:"smooth",block:"center"})},120);return}
-  if(b.dataset.pv!=null&&c.vids){const v=c.vids[+b.dataset.pv];if(!v)return;g("cpHero").innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+v+'?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&playsinline=1&fs=0&disablekb=1" title="'+t+'" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe><div style="position:absolute;left:0;right:0;top:0;height:62px;z-index:2"></div><div style="position:absolute;right:0;bottom:0;width:96px;height:40px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:2"><button type="button" aria-label="Full screen" style="all:unset;cursor:pointer;color:#fff;display:grid;place-items:center;width:100%;height:100%" onclick="var h=this.closest(\'.cpHero\');if(document.fullscreenElement)document.exitFullscreen();else if(h.requestFullscreen)h.requestFullscreen();else if(h.webkitRequestFullscreen)h.webkitRequestFullscreen()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>';el.scrollTo({top:0,behavior:"smooth"});return}
+  if(b.dataset.pv!=null&&c.vids){const v=c.vids[+b.dataset.pv];if(!v)return;g("cpHero").innerHTML='<iframe src="https://www.youtube-nocookie.com/embed/'+v+'?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&playsinline=1" title="'+t+'" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';el.scrollTo({top:0,behavior:"smooth"});return}
   if(b.dataset.st){cpRate=+b.dataset.st;document.querySelectorAll("#cpPick button").forEach(k=>k.classList.toggle("on",+k.dataset.st<=cpRate));return}
   if(b.id==="cpSb"){if(!cpRate)return toast("Tap the stars to choose a rating.");
    if(!S.user){toast("Please sign in to leave a rating.");if(typeof openAuth==="function")openAuth("in");return}
@@ -2534,64 +2576,6 @@ const sel=".card,.cc,#crg article,.lv>*,.demo,.rr";
 document.addEventListener("pointermove",e=>{const t=e.target.closest&&e.target.closest(sel);if(!t)return;const r=t.getBoundingClientRect();t.style.setProperty("--mx",(e.clientX-r.left)+"px");t.style.setProperty("--my",(e.clientY-r.top)+"px")},{passive:true});
 const up=()=>{const h=document.documentElement,m=h.scrollHeight-h.clientHeight;sp.style.width=(m>0?h.scrollTop/m*100:0)+"%"};addEventListener("scroll",up,{passive:true});up()})();
 </script>
-<script id="chat-js">
-(function(){
-var ROOMS=[["general","General"],["100","100L"],["200","200L"],["300","300L"],["400","400L"]],C={room:"general",ch:null,names:{},last:0},el=document.createElement("div");
-el.id="chat";el.setAttribute("role","dialog");el.setAttribute("aria-label","Student chat");document.body.appendChild(el);
-function ava(p,n){if(p&&p.avatar_url)return '<img class="cav" src="'+esc(p.avatar_url)+'" alt="" loading="lazy">';var i=String(n||"Student").trim().split(/\s+/).map(function(w){return w[0]}).slice(0,2).join("").toUpperCase()||"N";return '<span class="cav">'+esc(i)+'</span>'}
-async function need(ids){var m=ids.filter(function(i){return i&&!C.names[i]});if(!m.length)return;var r=await sb.from("profiles").select("id,full_name,avatar_url").in("id",m);(r.data||[]).forEach(function(p){C.names[p.id]=p});m.forEach(function(i){if(!C.names[i])C.names[i]={}})}
-function row(m){var p=C.names[m.user_id]||{},me=S.user&&m.user_id===S.user.id,n=p.full_name||"Student",t=new Date(m.created_at).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
- return '<div class="cm'+(me?" me":"")+'" data-id="'+m.id+'">'+ava(p,n)+'<div class="cb"><div class="cn">'+(me?"You":esc(n))+'<time>'+t+'</time></div>'+(m.body?'<p>'+esc(m.body)+'</p>':'')+med(m.media_url)+'</div>'+(me||isAdmin()?'<button class="cx" data-del="'+m.id+'">Delete</button>':'<button class="cx" data-rep="'+m.id+'">Report</button>')+'</div>'}
-var MP=SU+"/storage/v1/object/public/chat-media/";
-function med(u){return u&&String(u).indexOf(MP)===0?'<a href="'+esc(u)+'" target="_blank" rel="noopener"><img class="cmi" src="'+esc(u)+'" alt="Shared image" loading="lazy"></a>':""}
-var note=function(t){return '<p class="note" style="padding:24px;text-align:center">'+t+'</p>'};
-function add(m){var L=$("#cL");if(!L)return;var e=L.querySelector(".note");if(e)e.remove();var nb=L.scrollHeight-L.scrollTop-L.clientHeight<120||(S.user&&m.user_id===S.user.id);L.insertAdjacentHTML("beforeend",row(m));if(nb)L.scrollTop=L.scrollHeight}
-function unsub(){if(C.ch){try{sb.removeChannel(C.ch)}catch(e){}C.ch=null}}
-function sub(){unsub();C.ch=sb.channel("chat-"+C.room)
- .on("postgres_changes",{event:"INSERT",schema:"public",table:"chat_messages",filter:"room=eq."+C.room},async function(e){var m=e.new;if($('#cL [data-id="'+m.id+'"]'))return;await need([m.user_id]);if($('#cL [data-id="'+m.id+'"]'))return;add(m)})
- .on("postgres_changes",{event:"DELETE",schema:"public",table:"chat_messages"},function(e){var x=$('#cL [data-id="'+e.old.id+'"]');if(x)x.remove()}).subscribe()}
-async function load(){var L=$("#cL"),room=C.room;L.innerHTML=note("Loading...");
- var r=await sb.from("chat_messages").select("*").eq("room",room).order("created_at",{ascending:false}).limit(50);if(room!==C.room)return;
- if(r.error){L.innerHTML=note("Chat is not set up yet. Run nuasa-chat.sql in Supabase.");return}
- var d=(r.data||[]).reverse();await need(d.map(function(m){return m.user_id}));L.innerHTML=d.length?d.map(row).join(""):note("No messages yet. Say hello.");L.scrollTop=L.scrollHeight;sub()}
-function shell(){el.innerHTML='<div class="ch"><h3>Student chat</h3><button class="ib" data-cc aria-label="Close chat">✕</button></div><div class="rt">'+ROOMS.map(function(r){return '<button data-room="'+r[0]+'" class="'+(r[0]===C.room?"on":"")+'">'+r[1]+'</button>'}).join("")+'</div><div id="cL"></div><div class="cf"><button class="ib" id="cA" aria-label="Attach image or GIF"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg></button><input type="file" id="cFile" accept="image/*" hidden><input class="inp" id="cI" maxlength="500" placeholder="Write a message" autocomplete="off"><button class="btn p" id="cS">Send</button></div>'}
-async function ensure(){if(S.profile)return;try{var n=((S.user.email||"").split("@")[0])||"Student",r=await sb.from("profiles").upsert({id:S.user.id,full_name:n},{onConflict:"id",ignoreDuplicates:true}).select().maybeSingle();if(r.data)S.profile=r.data}catch(e){}}
-async function send(mu){var i=$("#cI"),v=i.value.trim();if(!v&&!mu)return;if(Date.now()-C.last<2000)return toast("Slow down a little.");C.last=Date.now();i.value="";await ensure();
- var o={room:C.room,user_id:S.user.id,body:v.slice(0,500)};if(mu)o.media_url=mu;var r=await sb.from("chat_messages").insert(o).select().single();
- if(r.error){i.value=v;return toast(/policy|slow/i.test(r.error.message)?"You can't post right now.":r.error.message)}await need([S.user.id]);add(r.data)}
-function fit(f){return new Promise(function(ok,no){var u=URL.createObjectURL(f),im=new Image();im.onload=function(){var k=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(function(b){b?ok(b):no(new Error("Could not read that image."))},"image/jpeg",.82)};im.onerror=function(){no(new Error("Could not read that image."))};im.src=u})}
-async function pick(file){if(!file)return;if(!/^image\//.test(file.type))return toast("Choose an image or GIF.");var gif=file.type==="image/gif";if(gif&&file.size>5*1024*1024)return toast("GIFs must be under 5 MB.");
- if(Date.now()-C.last<2000)return toast("Slow down a little.");toast("Uploading...");
- try{var blob=gif?file:await fit(file),path=S.user.id+"/"+Date.now()+"."+(gif?"gif":"jpg"),u=await sb.storage.from("chat-media").upload(path,blob,{contentType:gif?"image/gif":"image/jpeg",cacheControl:"31536000"});
-  if(u.error)throw u.error;await send(sb.storage.from("chat-media").getPublicUrl(path).data.publicUrl)}catch(x){toast(x.message||"Upload failed.")}}
-function close(){el.classList.remove("on");document.body.style.overflow="";unsub()}
-window.openChat=function(){if(!S.user||!sb){toast("Sign in to join the chat.");$("#authBtn").click();return}
- shell();el.classList.add("on");document.body.style.overflow="hidden";load();setTimeout(function(){var i=$("#cI");if(i)i.focus()},50)};
-el.addEventListener("click",async function(e){var b=e.target.closest("button");if(!b)return;
- if(b.hasAttribute("data-cc"))return close();
- if(b.dataset.room){C.room=b.dataset.room;el.querySelectorAll(".rt button").forEach(function(x){x.classList.toggle("on",x===b)});return load()}
- if(b.id==="cS")return send();
- if(b.id==="cA")return $("#cFile").click();
- if(b.dataset.del){if(!confirm("Delete this message?"))return;var im=$('#cL [data-id="'+b.dataset.del+'"] .cmi'),pp=im&&im.src.split("/chat-media/")[1],r=await sb.from("chat_messages").delete().eq("id",b.dataset.del);if(r.error)return toast(r.error.message);if(pp)sb.storage.from("chat-media").remove([decodeURIComponent(pp.split("?")[0])]);var x=$('#cL [data-id="'+b.dataset.del+'"]');if(x)x.remove();return}
- if(b.dataset.rep){var q=await sb.from("chat_reports").insert({message_id:+b.dataset.rep,reporter:S.user.id});toast(q.error&&!/duplicate/i.test(q.error.message)?q.error.message:"Reported. An admin will review it.")}});
-el.addEventListener("change",function(e){if(e.target.id==="cFile"){var f=e.target.files[0];e.target.value="";pick(f)}});
-el.addEventListener("keydown",function(e){if(e.target.id==="cI"&&e.key==="Enter"){e.preventDefault();send()}});
-document.addEventListener("keydown",function(e){if(e.key==="Escape"&&el.classList.contains("on"))close()});
-$("#dChat").onclick=function(e){e.preventDefault();if(typeof od==="function")od(false);openChat()};
-/* ---- profile photo ---- */
-function rs(f){return new Promise(function(ok,no){var u=URL.createObjectURL(f),im=new Image();im.onload=function(){var s=Math.min(im.width,im.height),c=document.createElement("canvas");c.width=c.height=256;c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,256,256);URL.revokeObjectURL(u);c.toBlob(function(b){b?ok(b):no(new Error("Could not read that image."))},"image/jpeg",.85)};im.onerror=function(){no(new Error("Could not read that image."))};im.src=u})}
-var _ma=menuAcct;window.menuAcct=function(){_ma();var a=document.querySelector("#mAcct .av");if(a&&S.profile&&S.profile.avatar_url)a.innerHTML='<img src="'+esc(S.profile.avatar_url)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'};menuAcct();
-var _op=openProfile;window.openProfile=function(){_op();var f=document.querySelector("#md .form");if(!f||!$("#epGo")||!S.user)return;var n=(S.profile&&S.profile.full_name)||"Student";
- f.insertAdjacentHTML("afterbegin",'<div class="apr"><div id="apV">'+ava(S.profile,n)+'</div><div><label class="btn s" style="cursor:pointer;height:38px">Change photo<input id="apF" type="file" accept="image/*" hidden></label><p class="note" style="margin-top:6px">We crop it square.</p></div></div>');
- $("#apF").onchange=async function(){var file=this.files[0];if(!file)return;if(!/^image\//.test(file.type))return toast("Choose an image file.");
-  try{var b=await rs(file),path=S.user.id+"/avatar.jpg",u=await sb.storage.from("avatars").upload(path,b,{contentType:"image/jpeg",upsert:true,cacheControl:"3600"});if(u.error)throw u.error;
-   var url=sb.storage.from("avatars").getPublicUrl(path).data.publicUrl+"?v="+Date.now(),r=await sb.from("profiles").update({avatar_url:url}).eq("id",S.user.id).select().maybeSingle();if(r.error)throw r.error;
-   if(!r.data){r=await sb.from("profiles").insert({id:S.user.id,full_name:n,avatar_url:url}).select().maybeSingle();if(r.error)throw r.error}
-   S.profile=Object.assign({},S.profile||{},{avatar_url:url});C.names[S.user.id]=Object.assign({},C.names[S.user.id],{avatar_url:url});$("#apV").innerHTML=ava(S.profile,n);menuAcct();toast("Photo updated.")}
-  catch(x){toast(x.message||"Could not upload the photo.")}}};
-})();
-</script>
-
 <script id="motion-js">
 (function(){
 var h=document.documentElement;h.classList.add("js");               /* content stays visible if JS fails */
