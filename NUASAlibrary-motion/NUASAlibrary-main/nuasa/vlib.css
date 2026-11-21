@@ -21,7 +21,7 @@
 #vlp [hidden]{display:none!important}
 #vlp #vl-cv{position:absolute;inset:0;width:100%;height:100%;display:block;outline:none;touch-action:none}
 .vl-ui{position:absolute;inset:0;pointer-events:none}
-.vl-ui button,.vl-ui input,.vl-ui aside,.vl-ui .vl-dlg,.vl-ui .vl-pan,.vl-ui .vl-intro,.vl-ui .vl-kick,.vl-ui .vl-sub{pointer-events:auto}
+.vl-ui button,.vl-ui input,.vl-ui aside,.vl-ui .vl-dlg,.vl-ui .vl-pan,.vl-ui .vl-intro,.vl-ui .vl-kick,.vl-ui .vl-sub,.vl-ui .vl-opt,.vl-ui .vl-offer,.vl-ui .vl-joy{pointer-events:auto}
 .vl-ui kbd{font:500 11px ui-monospace,Menlo,Consolas,monospace;padding:1px 6px;border-radius:5px;border:1px solid rgba(255,255,255,.35);margin-right:7px;opacity:.85}
 body.vl-touch .vl-ui kbd{display:none}
 .vl-load{position:absolute;inset:0;display:grid;place-content:center;gap:14px;text-align:center;padding:24px}
@@ -59,7 +59,7 @@ body.vl-touch .vl-ret{opacity:.25}
 .vl-prompt{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-50%);min-height:46px;padding:0 20px;border-radius:14px;background:var(--g);color:#04130a;font:600 15px var(--b);border:0;cursor:pointer;box-shadow:0 14px 34px -12px rgba(34,197,94,.8);white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
 .vl-prompt kbd{border-color:rgba(4,19,10,.5);color:#04130a}.vl-prompt.dis{background:#6b7280;color:#fff;box-shadow:none}.vl-prompt b{font-weight:700}
 
-.vl-chat{position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);width:min(360px,calc(100vw - 24px));display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.vl-chat{position:absolute;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 164px);width:min(360px,calc(100vw - 24px));display:flex;flex-direction:column;gap:8px;pointer-events:none}
 .vl-log{max-height:150px;overflow:hidden;display:flex;flex-direction:column;gap:3px;opacity:.0;transition:opacity .4s;pointer-events:none;mask-image:linear-gradient(transparent,#000 30%);-webkit-mask-image:linear-gradient(transparent,#000 30%)}
 .vl-chat.fresh .vl-log,.vl-chat.open .vl-log{opacity:1}.vl-chat.open .vl-log{overflow:auto;pointer-events:auto}
 .vl-l{font-size:13.5px;line-height:1.35;padding:4px 10px;border-radius:9px;background:rgba(14,16,19,.7);width:fit-content;max-width:100%;text-shadow:0 1px 2px rgba(0,0,0,.4)}
@@ -93,8 +93,6 @@ body.vl-touch .vl-ret{opacity:.25}
 .vl-hl{list-style:none;padding:0;margin:0;display:grid;gap:7px;font-size:14.5px;color:#cfd5db}.vl-hl b{color:#fff}
 .vl-set{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;color:#cfd5db}.vl-set input[type=range]{width:55%;accent-color:#22c55e}.vl-set input[type=checkbox]{width:18px;height:18px;accent-color:#22c55e}
 
-.vl-joy{position:fixed;display:none;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.3);pointer-events:none}
-.vl-joy i{position:absolute;left:33px;top:33px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.55)}
 .vl-pause{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:12px 22px;border-radius:99px;background:rgba(14,16,19,.85);border:1px solid rgba(255,255,255,.2);font:600 15px var(--b);pointer-events:none}
 .vl-fade{position:absolute;inset:0;background:#000;opacity:0;transition:opacity .8s;pointer-events:none}.vl-fade.on{opacity:1}
 .vl-kick,.vl-intro{position:absolute;inset:0;display:grid;place-items:center;padding:16px;background:radial-gradient(900px 500px at 50% 0,rgba(226,194,106,.14),transparent 60%),rgba(8,9,11,.82);backdrop-filter:blur(7px);overflow:auto}
@@ -104,5 +102,35 @@ body.vl-touch .vl-ret{opacity:.25}
 .vl-iw p,.vl-kw p{margin:0;color:#b8c0c8;font-size:15px;line-height:1.55}
 .vl-nm{display:grid;gap:6px;font-size:13px;font-weight:600;width:100%}.vl-nm input{height:46px;border-radius:11px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.35);color:#fff;padding:0 14px;font:16px var(--b);user-select:text;-webkit-user-select:text}.vl-nm input:focus{outline:none;border-color:var(--g)}
 .vl-iw .vl-hl{padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.05);width:100%}
-@media(max-width:700px){.vl-ttl,.vl-meter span{display:none}.vl-meter i{width:62px}.vl-top{gap:6px}.vl-b{padding:0 10px}.vl-b span{display:none}.vl-chat{bottom:calc(env(safe-area-inset-bottom,0px) + 150px)}.vl-card{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 140px);right:10px;left:10px;width:auto;max-height:44vh;overflow:auto}.vl-sub{bottom:calc(env(safe-area-inset-bottom,0px) + 200px)}.vl-hold{bottom:calc(env(safe-area-inset-bottom,0px) + 80px)}}
+@media(max-width:700px){.vl-b.dk{display:none}.vl-ttl,.vl-meter span{display:none}.vl-meter i{width:62px}.vl-top{gap:6px}.vl-b{padding:0 10px}.vl-b span{display:none}.vl-chat{bottom:calc(env(safe-area-inset-bottom,0px) + 164px)}.vl-card{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 140px);right:10px;left:10px;width:auto;max-height:44vh;overflow:auto}.vl-sub{bottom:calc(env(safe-area-inset-bottom,0px) + 200px)}.vl-hold{bottom:calc(env(safe-area-inset-bottom,0px) + 80px)}}
 @media(prefers-reduced-motion:reduce){.vlh-v .bb,.vl-warn{animation:none}}
+
+/* v2: visible joystick, offer cards, character creator, settings, graphics polish */
+.vl-vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.36) 100%)}
+.vl-nopad .vl-chat{bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
+.vl-cardup .vl-sub{bottom:calc(env(safe-area-inset-bottom,0px) + 214px)}
+.vl-joy{position:absolute;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 22px);width:128px;height:128px;border-radius:50%;background:radial-gradient(circle at 50% 38%,rgba(255,255,255,.26),rgba(255,255,255,.08) 70%);border:2px solid rgba(255,255,255,.5);box-shadow:0 12px 30px -12px rgba(0,0,0,.7),inset 0 0 20px rgba(255,255,255,.14);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);touch-action:none;cursor:grab;z-index:3}
+.vl-joy .a{position:absolute;width:0;height:0;opacity:.8;border:6px solid transparent}
+.vl-joy .u{left:50%;top:6px;margin-left:-6px;border-top:0;border-bottom:9px solid #fff}.vl-joy .d{left:50%;bottom:6px;margin-left:-6px;border-bottom:0;border-top:9px solid #fff}
+.vl-joy .l{top:50%;left:6px;margin-top:-6px;border-left:0;border-right:9px solid #fff}.vl-joy .r{top:50%;right:6px;margin-top:-6px;border-right:0;border-left:9px solid #fff}
+.vl-joy i{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#cfd6dd 72%);box-shadow:0 6px 16px rgba(0,0,0,.5);transition:transform .05s}
+.vl-joy.hot{border-color:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.25),0 12px 30px -12px rgba(0,0,0,.7)}
+.vl-opt,.vl-offer{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-50%);width:min(480px,94vw);padding:14px 16px;border-radius:18px;background:rgba(14,16,19,.93);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(14px);display:grid;gap:6px;z-index:2;box-shadow:0 24px 60px -24px #000}
+.vl-opt b,.vl-offer b{font:700 16px var(--d);letter-spacing:-.01em}.vl-opt span,.vl-offer span{font-size:13px;color:#aab2bb}
+.vl-opt .vl-ca,.vl-offer .vl-ca{margin-top:6px}.vl-opt .vl-ca{display:grid;grid-template-columns:1fr 1fr;gap:6px}.vl-opt .vl-ca .vl-p{grid-column:1/-1}.vl-opt .vl-ca button,.vl-offer .vl-ca button{height:40px;padding:0 12px;font-size:13.5px}
+.vl-b.big2{width:100%;height:46px;justify-content:center;font-size:15px}
+.vl-seg{display:inline-flex;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.18)}.vl-seg button{padding:9px 12px;font:600 13px var(--b);color:#cfd5db;background:transparent;cursor:pointer}.vl-seg button.on{background:#22c55e;color:#04130a}
+.vl-sr{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;color:#cfd5db;flex-wrap:wrap}
+.vl-pw.ed{width:min(780px,100%)}
+.vl-ebody{display:grid;grid-template-columns:250px minmax(0,1fr);gap:18px}
+.vl-prev{display:grid;gap:8px;justify-items:center;align-content:start}
+.vl-prev canvas{width:100%;height:350px;border-radius:16px;background:radial-gradient(circle at 50% 28%,#34493f,#12161a 75%);touch-action:none;cursor:grab;display:block}
+.vl-tabs{display:flex;gap:6px;flex-wrap:wrap}.vl-tabs button{height:34px;padding:0 13px;border-radius:99px;background:rgba(255,255,255,.07);color:#cfd5db;font:600 13px var(--b);cursor:pointer}.vl-tabs button.on{background:#fff;color:#0c120e}
+.vl-f{display:grid;gap:7px;margin-top:14px}.vl-f>span{font:700 11.5px var(--b);color:#aab2bb;text-transform:uppercase;letter-spacing:.08em}
+.vl-sw{display:flex;flex-wrap:wrap;gap:8px}.vl-sw button{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.28);cursor:pointer}.vl-sw button.on{outline:3px solid #22c55e;outline-offset:2px}
+.vl-stl{display:flex;flex-wrap:wrap;gap:6px}.vl-stl button{min-height:36px;padding:0 12px;border-radius:10px;background:rgba(255,255,255,.07);color:#fff;font:600 13px var(--b);cursor:pointer}.vl-stl button.on{background:#22c55e;color:#04130a}
+@media(max-width:660px){.vl-ebody{grid-template-columns:1fr}.vl-prev canvas{height:250px}.vl-joy{width:116px;height:116px}.vl-joy i{width:48px;height:48px;margin:-24px 0 0 -24px}}
+.vl-pan{z-index:8}.vl-dlg{z-index:7}.vl-kick,.vl-intro{z-index:4}
+.vl-opt .vl-ca .vl-p{grid-column:auto}
+.vl-cardup .vl-sub{bottom:calc(env(safe-area-inset-bottom,0px) + 236px)}
+@media(max-width:700px){.vl-cardup .vl-sub{bottom:calc(env(safe-area-inset-bottom,0px) + 250px)}.vl-opt,.vl-offer{bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}}
