@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Approve masterclass access</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:460px;margin:0 auto;padding:24px;color:#1b2430}h1{font-size:22px}label{display:block;margin:14px 0 4px;font-weight:600}
+input,select,button{font:inherit;width:100%;padding:12px;border:1px solid #c9d1d9;border-radius:10px;box-sizing:border-box}button{background:#0f7a4a;color:#fff;border:0;margin-top:14px;cursor:pointer;font-weight:600}
+button.s{background:#fff;color:#b42318;border:1px solid #b42318}#msg{margin-top:16px;padding:12px;border-radius:10px;display:none}.ok{background:#e7f6ee;color:#0a5c37}.er{background:#fdeceb;color:#b42318}.log{font-size:14px;color:#556}</style></head><body>
+<h1>Approve masterclass access</h1><p id="who" class="log">Checking sign-in…</p>
+<form id="f" hidden onsubmit="return false">
+<label>Student's email (the one they signed up with)</label><input id="em" type="email" autocomplete="off" placeholder="student@example.com">
+<label>Course</label><select id="co"><option value="XL-4821">Microsoft Excel masterclass</option></select>
+<label>Days of access</label><select id="dy"><option value="30">30 days (one month)</option><option value="60">60 days</option><option value="90">90 days</option><option value="365">1 year</option></select>
+<button id="go" type="submit">Approve</button><button id="rm" class="s" type="button">Remove access</button></form>
+<div id="msg"></div><h2 style="font-size:16px;margin-top:28px">Done this visit</h2><div id="log" class="log">Nothing yet.</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+const sb=supabase.createClient("https://wcikankedtelqbojzjdm.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjaWthbmtlZHRlbHFib2p6amRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4NzQ4ODAsImV4cCI6MjEwNzQ1MDg4MH0.lo1ZscA3uVBsggtxHW9U2YPPDhQAWYa3pATioq83wQ4");
+const $=id=>document.getElementById(id),show=(t,ok)=>{const m=$("msg");m.textContent=t;m.className=ok?"ok":"er";m.style.display="block"},add=t=>{const l=$("log");if(l.textContent==="Nothing yet.")l.textContent="";l.insertAdjacentHTML("afterbegin","<div>"+t.replace(/</g,"&lt;")+"</div>")};
+(async()=>{const {data:{session}}=await sb.auth.getSession();
+ if(!session){$("who").innerHTML='Sign in on the <a href="/">main site</a> first (as admin), then reload this page.';return}
+ const {data:p}=await sb.from("profiles").select("role,full_name").eq("id",session.user.id).maybeSingle();
+ if(!p||p.role!=="admin"){$("who").textContent="Signed in as "+session.user.email+", but this account is not an admin.";return}
+ $("who").textContent="Signed in as "+session.user.email+" (admin)";$("f").hidden=false})();
+async function run(fn,args,label){const em=$("em").value.trim();if(!/^\S+@\S+\.\S+$/.test(em))return show("Enter a valid email.");
+ $("go").disabled=$("rm").disabled=true;const {data,error}=await sb.rpc(fn,args(em));$("go").disabled=$("rm").disabled=false;
+ if(error)return show("Failed: "+error.message);if(data==="NO_USER")return show("No account with that email. Ask the student to sign up on the site first, using that same email.");
+ show(label(data),true);add(new Date().toLocaleTimeString()+"  "+em+"  "+label(data))}
+$("go").onclick=()=>run("nuasa_enroll",em=>({p_email:em,p_course:$("co").value,p_days:+$("dy").value}),d=>"Approved until "+d);
+$("rm").onclick=()=>{if(confirm("Remove this student's access?"))run("nuasa_unenroll",em=>({p_email:em,p_course:$("co").value}),()=>"Access removed")};
+</script></body></html>
