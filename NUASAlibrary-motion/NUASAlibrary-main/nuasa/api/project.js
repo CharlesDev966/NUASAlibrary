@@ -8,7 +8,11 @@ const AI_KEY = process.env.AI_API_KEY || process.env.GROQ_API_KEY || process.env
 const AI_BASE = (process.env.AI_BASE_URL || (process.env.XAI_API_KEY && !process.env.AI_API_KEY && !process.env.GROQ_API_KEY ? "https://api.x.ai/v1" : "https://api.groq.com/openai/v1")).replace(/\/+$/, "");
 // Old-style service_role keys are JWTs (start with "eyJ") and go in both headers; new-style secret keys (sb_secret_...) go in "apikey" only.
 const SRV = k => (k && k.startsWith("eyJ")) ? { apikey: k, Authorization: "Bearer " + k } : { apikey: k };
-const MODEL = process.env.AI_MODEL || process.env.GROQ_MODEL || (AI_BASE.includes("x.ai") ? "grok-4.3" : "llama-3.3-70b-versatile");
+// Groq retired llama-3.3-70b-versatile and llama-3.1-8b-instant on 16 Aug 2026. If an old name is still set in Vercel env vars, swap it automatically.
+const RETIRED = { "llama-3.3-70b-versatile": "openai/gpt-oss-120b", "llama-3.1-8b-instant": "openai/gpt-oss-20b", "llama3-70b-8192": "openai/gpt-oss-120b", "llama3-8b-8192": "openai/gpt-oss-20b" };
+const WANT = process.env.AI_MODEL || process.env.GROQ_MODEL || (AI_BASE.includes("x.ai") ? "grok-4.3" : "openai/gpt-oss-120b");
+const MODEL = AI_BASE.includes("groq.com") && RETIRED[WANT] ? RETIRED[WANT] : WANT;
+const IS_GPT_OSS = MODEL.includes("gpt-oss");
 const PRIOR_CHARS = parseInt(process.env.AI_PRIOR_CHARS || "7000", 10); // how much earlier text is sent back for consistency (smaller = fewer tokens per call, which suits free plans)
 const USER_LIMIT = parseInt(process.env.PROJECT_USER_LIMIT || "20", 10);    // AI calls per student per 24h (9 = one full draft: plan + 8 parts; the rest are for regenerating parts)
 const GLOBAL_LIMIT = parseInt(process.env.PROJECT_GLOBAL_LIMIT || "160", 10); // AI calls for everyone per 24h (protects the free quota)
@@ -24,6 +28,7 @@ const shape = sc => sc.type === "ARRAY" ? [shape(sc.items)] : sc.type === "OBJEC
 const JSON_RULE = sc => `\n\nReturn ONLY one valid JSON object (no markdown, no commentary) in exactly this shape. Replace each placeholder with real content. Arrays hold as many items as the rules above ask for:\n${JSON.stringify(shape(sc))}`;
 function aiCall({ system, user, max, temp, json, stream }) {
   const body = { model: MODEL, messages: [{ role: "system", content: system }, { role: "user", content: user }], max_tokens: max, temperature: temp };
+  if (IS_GPT_OSS && AI_BASE.includes("groq.com")) body.reasoning_effort = "low"; // gpt-oss "thinks" first; keep it short so the token budget goes to the answer
   if (json) body.response_format = { type: "json_object" };
   if (stream) body.stream = true;
   return fetch(AI_BASE + "/chat/completions", { method: "POST", headers: { Authorization: "Bearer " + AI_KEY, "content-type": "application/json" }, body: JSON.stringify(body) });
