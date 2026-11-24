@@ -145,7 +145,8 @@ footer{border-top:1px solid var(--line);padding:48px 0 calc(48px + env(safe-area
 #drawer nav>*{flex-shrink:0}#drawer .top .brand span{display:inline}#drawer nav{width:min(360px,88vw);overflow-y:auto;gap:0;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 20px)}
 #drawer .top{margin-bottom:14px}
 #drawer .mac{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:8px;background:var(--sub)}
-#drawer .mac .av{width:42px;height:42px;border-radius:50%;background:var(--g);color:#04130a;display:grid;place-items:center;font:800 16px var(--d);flex:none}
+.epav{width:76px;height:76px;border-radius:50%;background:var(--g);color:#04130a;display:grid;place-items:center;overflow:hidden;flex:none;font:800 26px var(--d)}.epav img,#drawer .mac .av img{width:100%;height:100%;object-fit:cover;display:block}
+#drawer .mac .av{overflow:hidden;width:42px;height:42px;border-radius:50%;background:var(--g);color:#04130a;display:grid;place-items:center;font:800 16px var(--d);flex:none}
 #drawer .mac .nm{font:700 17px/1.15 var(--d);letter-spacing:-.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #drawer .mac .rl{font-size:13px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #drawer nav .mi{display:flex;align-items:center;gap:14px;position:relative;min-height:44px;padding:10px 12px;border-radius:12px;font-size:16px;font-weight:500}
@@ -637,6 +638,8 @@ footer{border-top:1px solid color-mix(in srgb,var(--g) 18%,var(--line));backgrou
 #drawer .sw{background:var(--micl)}#drawer .sw:after{background:var(--mfg)}
 :root[data-theme="light"] #drawer .sw{background:var(--g)}
 #drawer .mft{margin:18px 14px 0;padding:16px 12px calc(env(safe-area-inset-bottom,0px) + 6px);border-top:1px solid var(--mline);font-size:12px;line-height:1.5;color:var(--mmut)}
+#drawer nav .mi-soon{cursor:default}#drawer nav .mi-soon .ic svg{opacity:.75}
+#drawer .soonTag{margin-left:auto;flex:none;font:700 11px/1 var(--b);letter-spacing:.08em;text-transform:uppercase;padding:5px 9px;border-radius:999px;color:var(--g);background:color-mix(in srgb,var(--g) 16%,transparent);border:1px solid color-mix(in srgb,var(--g) 38%,transparent);font-style:normal}
 @media(prefers-reduced-motion:reduce){#drawer.open nav .mi.big{animation:none}#drawer nav .mi .ic,#drawer nav .mi{transition:none}}
 </style><script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script>tailwind.config={prefix:"tw-",corePlugins:{preflight:false},theme:{extend:{colors:{card:"var(--card)",sub:"var(--sub)",line:"var(--line)",mut:"var(--mut)",brand:"var(--g)"},fontFamily:{display:["var(--d)"]}}}}</script>
@@ -781,6 +784,7 @@ html{scroll-behavior:smooth}
   <a href="#classes" class="mi big" title="ATS, ICAN and CITN study centers"><i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M10 9.5v4l3.5-2z"/><path d="M8 21h8"/></svg></i><span>Professional Certifications</span></a>
   <a href="#" class="mi big" id="dPj" title="Topic ideas and full project drafts"><i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></i><span>Project AI</span></a>
   <a href="#" class="mi big" data-vl title="Walk through a 3D reading hall"><i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6M9 11h.01M15 11h.01"/></svg></i><span>Virtual Library</span></a>
+  <a href="#" class="mi big mi-soon" id="dComm" aria-disabled="true" title="Student community, coming soon"><i class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1"/><circle cx="17.5" cy="9" r="2.6"/><path d="M17 14.2a4.2 4.2 0 0 1 4 4.1V20"/></svg></i><span>Student Community</span><em class="soonTag">Soon</em></a>
   <div class="mgap"></div>
   <p class="mh">Explore</p>
   <a href="#top" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg><span>Home</span></a><a href="#opps" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"/></svg><span>Opportunities</span></a><a href="#courses" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg><span>Masterclasses</span></a><a href="#how" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span>How it works</span></a><a href="#faq" class="mi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5M12 17h.01"/></svg><span>FAQ</span></a>
@@ -1399,6 +1403,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const toast=m=>{const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(t._);t._=setTimeout(()=>t.style.display="none",3800)};
 const dr=$("#drawer"),od=o=>{dr.classList.toggle("open",o);dr.setAttribute("aria-hidden",!o)};
 $("#mb").onclick=()=>od(true);$("#mc").onclick=$("#sc").onclick=()=>od(false);dr.querySelectorAll("a").forEach(a=>a.onclick=()=>od(false));
+$("#dComm").addEventListener("click",e=>{e.preventDefault();toast("Student Community is coming soon")});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")od(false)});
 $("#yr").textContent=new Date().getFullYear();
 function setTheme(m){document.documentElement.dataset.theme=m;try{localStorage.setItem("nuasa_theme",m)}catch(e){}$("#dTh").setAttribute("aria-checked",String(m==="light"));let mt=document.querySelector('meta[name="theme-color"]');if(!mt){mt=document.createElement("meta");mt.name="theme-color";document.head.appendChild(mt)}mt.content=m==="dark"?"#07080a":"#f6f8f5"}
@@ -2130,23 +2135,33 @@ function offBar(){let b=$("#offBar");if(!b){b=document.createElement("div");b.id
 addEventListener("online",()=>{offBar();load()});addEventListener("offline",offBar);offBar();
 
 /* ---------- Menu: account block, badges, current-section marker ---------- */
+const avUrl=u=>{const m=(u&&u.user_metadata)||{};return m.avatar_path&&sb?sb.storage.from(BUCKET).getPublicUrl(m.avatar_path).data.publicUrl+"?v="+(m.avatar_v||0):""};
+const avBlob=f=>new Promise((res,rej)=>{const i=new Image(),o=URL.createObjectURL(f);i.onload=()=>{URL.revokeObjectURL(o);const s=Math.min(i.width,i.height),c=document.createElement("canvas");c.width=c.height=400;c.getContext("2d").drawImage(i,(i.width-s)/2,(i.height-s)/2,s,s,0,0,400,400);c.toBlob(b=>b?res(b):rej(new Error("Could not read that image.")),"image/jpeg",.85)};i.onerror=()=>{URL.revokeObjectURL(o);rej(new Error("Choose a JPG, PNG or WebP image."))};i.src=o});
 function menuAcct(){const el=$("#mAcct");if(!el)return;const u=S.user;
  if(!u)el.innerHTML='<div class="rl" style="flex:1 1 100%;white-space:normal;font-size:14px;line-height:1.45;color:var(--fg)">Sign in to upload files, take CBTs and use Project AI.</div><button class="btn p" id="mSign" style="flex:1 1 100%;height:42px">Sign in</button>';
  else{const n=(S.profile&&S.profile.full_name)||(u.email||"").split("@")[0]||"Student",ini=n.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase()||"N";
-  el.innerHTML=`<span class="av">${esc(ini)}</span><div style="min-width:0;flex:1"><div class="nm">${esc(n)}</div><div class="rl">${isAdmin()?"Admin account":esc(u.email||"")}</div></div><button class="btn s" id="mEdit" style="height:34px;padding:0 12px;font-size:13px">Edit</button>`;const me=$("#mEdit");if(me)me.onclick=()=>{od(false);openProfile()}}
+  el.innerHTML=`<span class="av">${avUrl(u)?`<img src="${esc(avUrl(u))}" alt="">`:esc(ini)}</span><div style="min-width:0;flex:1"><div class="nm">${esc(n)}</div><div class="rl">${isAdmin()?"Admin account":esc(u.email||"")}</div></div><button class="btn s" id="mEdit" style="height:34px;padding:0 12px;font-size:13px">Edit</button>`;const me=$("#mEdit");if(me)me.onclick=()=>{od(false);openProfile()}}
  const so=$("#dOut");if(so)so.style.display=u?"":"none";const ms=$("#mSign");if(ms)ms.onclick=()=>{od(false);$("#authBtn").click()}}
 $("#dOut").onclick=e=>{e.preventDefault();od(false);$("#authBtn").click()};
 function openProfile(){const u=S.user;if(!u||!sb)return openAuth("in");const p=S.profile||{};
- openModal(mh("Edit profile","Update how you appear in the library.")+`<div class="form" style="border:0;padding:18px 0 0;background:none"><label>Full name<input class="inp" id="epN" maxlength="60" autocomplete="name" value="${esc(p.full_name||"")}"></label>
+ openModal(mh("Edit profile","Update how you appear in the library.")+`<div class="form" style="border:0;padding:18px 0 0;background:none"><div style="display:flex;align-items:center;gap:14px"><span class="epav" id="epAv">${avUrl(u)?`<img src="${esc(avUrl(u))}" alt="">`:esc(((p.full_name||u.email||"N").trim().split(/\s+/).map(w=>w[0]).slice(0,2).join("")||"N").toUpperCase())}</span><div style="display:grid;gap:8px"><button type="button" class="btn s" id="epPick" style="height:36px;padding:0 14px;font-size:13px">${avUrl(u)?"Change photo":"Upload photo"}</button><button type="button" class="btn s" id="epRm" style="height:36px;padding:0 14px;font-size:13px;${avUrl(u)?"":"display:none"}">Remove photo</button></div><input type="file" id="epF" accept="image/*" hidden></div><label>Full name<input class="inp" id="epN" maxlength="60" autocomplete="name" value="${esc(p.full_name||"")}"></label>
  <label>Bio<textarea class="inp" id="epB" rows="4" maxlength="300" placeholder="Level, interests, what you are studying for" style="height:auto;padding:10px 14px">${esc(p.bio||"")}</textarea></label>
  <label>Email<input class="inp" id="epE" type="email" autocomplete="email" value="${esc(u.email||"")}"></label><p class="note">If you change your email, we send a confirmation link to the new address. It only changes after you confirm.</p>
  <p class="note" id="epErr" style="color:var(--r)"></p><button class="btn p" id="epGo">Save changes</button></div>`);
+ let pend=null,rem=false;const epIni=$("#epAv").innerHTML;
+ $("#epPick").onclick=()=>$("#epF").click();
+ $("#epF").onchange=async()=>{const f=$("#epF").files[0];$("#epErr").textContent="";if(!f)return;if(!/^image\//.test(f.type))return $("#epErr").textContent="Choose an image file.";if(f.size>10*1024*1024)return $("#epErr").textContent="That photo is over 10 MB. Choose a smaller one.";
+  try{pend=await avBlob(f);rem=false;$("#epAv").innerHTML='<img alt="">';$("#epAv").firstChild.src=URL.createObjectURL(pend);$("#epRm").style.display="";$("#epPick").textContent="Change photo"}catch(e){$("#epErr").textContent=e.message}$("#epF").value=""};
+ $("#epRm").onclick=()=>{pend=null;rem=true;$("#epAv").innerHTML=(avUrl(u)&&false)?"":(epIni.indexOf("<img")>-1?esc(((p.full_name||u.email||"N").trim().split(/\s+/).map(w=>w[0]).slice(0,2).join("")||"N").toUpperCase()):epIni);$("#epRm").style.display="none";$("#epPick").textContent="Upload photo"};
  $("#epGo").onclick=async()=>{const er=m=>$("#epErr").textContent=m,name=$("#epN").value.trim().replace(/\s+/g," "),bio=$("#epB").value.trim(),em=$("#epE").value.trim();er("");
   if(name.length<2)return er("Enter your name.");if(!/^\S+@\S+\.\S+$/.test(em))return er("Enter a valid email address.");
   const b=$("#epGo");b.disabled=true;b.textContent="Saving...";
-  try{let r=await sb.from("profiles").update({full_name:name,bio:bio||null}).eq("id",u.id).select().maybeSingle();
+  try{let meta=null;const oldP=(u.user_metadata||{}).avatar_path,apath="avatars/"+u.id+"/avatar.jpg";
+   if(pend){const up=await sb.storage.from(BUCKET).upload(apath,pend,{contentType:"image/jpeg",upsert:true});if(up.error)throw new Error("Photo upload failed: "+up.error.message);meta={avatar_path:apath,avatar_v:Date.now()}}else if(rem&&oldP){meta={avatar_path:null,avatar_v:Date.now()};try{await sb.storage.from(BUCKET).remove([oldP])}catch(_){}}
+   let r=await sb.from("profiles").update({full_name:name,bio:bio||null}).eq("id",u.id).select().maybeSingle();
    if(r.error)throw r.error;if(!r.data){r=await sb.from("profiles").insert({id:u.id,full_name:name,bio:bio||null}).select().maybeSingle();if(r.error)throw r.error}
    S.profile=Object.assign({},S.profile||{},r.data||{full_name:name,bio:bio||null});
+   if(meta){const mu=await sb.auth.updateUser({data:meta});if(mu.error)throw mu.error;if(mu.data&&mu.data.user)S.user=mu.data.user}
    let msg="Profile updated.";
    if(em.toLowerCase()!==(u.email||"").toLowerCase()){const x=await sb.auth.updateUser({email:em},{emailRedirectTo:RD()});if(x.error)throw x.error;msg="Profile saved. Check "+em+" to confirm your new email."}
    closeModal();menuAcct();toast(msg)}catch(e){b.disabled=false;b.textContent="Save changes";er(e.message||"Could not save. Try again.")}}}
