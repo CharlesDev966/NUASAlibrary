@@ -663,6 +663,17 @@ footer{border-top:1px solid color-mix(in srgb,var(--g) 18%,var(--line));backgrou
 #crg article.mcUn:not(.mcOpen) [data-cpt],#crg article.mcUn:not(.mcOpen) button.btn.s[data-view]{display:none}
 #crg article.mcUn:not(.mcOpen) .mcWatch{display:block;width:100%;height:38px;padding:0 10px;font-size:13px}
 #crg article.mcUn.mcOpen .mcPoster{display:none}}
+/* library files: compact two-column cards on phones */
+@media(max-width:639px){.mg,#rec{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:clamp(8px,2.6vw,12px)!important}
+#rec{padding:clamp(8px,2.6vw,16px)!important}
+.mg .rr,#rec .rr{padding:clamp(8px,2.6vw,12px)!important;gap:6px!important;border-radius:12px!important;min-width:0}
+.mg .rr>div:nth-child(2),#rec .rr>div:nth-child(2){min-width:0!important;flex:1 1 100%!important}
+.mg .rr>div:nth-child(2)>div:first-of-type,#rec .rr>div:nth-child(2)>div:first-of-type{font-size:clamp(12.5px,3.5vw,14px)!important;line-height:1.3!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.mg .rr .note,#rec .rr .note{font-size:11px!important;line-height:1.35!important;margin-top:4px!important;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.mg .rr .ft,#rec .rr .ft{margin:0 0 4px!important;font-size:10px;padding:2px 6px}
+.mg .rr .btn,#rec .rr .btn{flex:1 1 100%!important;height:34px!important;font-size:12.5px!important;padding:0 8px!important}
+.mg .rr .btn[onclick^="offToggle"],#rec .rr .btn[onclick^="offToggle"]{display:none}}
+@media(max-width:299px){.mg,#rec{grid-template-columns:minmax(0,1fr)!important}}
 @media(max-width:299px){#crg{grid-template-columns:minmax(0,1fr)!important}}
 @media(prefers-reduced-motion:reduce){#drawer.open nav .mi.big{animation:none}#drawer nav .mi .ic,#drawer nav .mi{transition:none}}
 </style><script src="https://cdn.tailwindcss.com/3.4.17"></script>
