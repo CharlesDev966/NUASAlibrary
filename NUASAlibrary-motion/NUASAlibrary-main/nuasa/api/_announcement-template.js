@@ -43,7 +43,7 @@ module.exports = function buildEmail(name) {
   <p style="margin:0 0 14px 0;">You can open them anytime here: <a href="${SITE}">${SITE.replace("https://", "")}</a></p>
   <p style="margin:0 0 14px 0;">If you have any question, just reply to this email.</p>
   <p style="margin:0 0 22px 0;">Regards,<br>NUASA Library, UNIUYO</p>
-  <p style="margin:0;font-size:12px;color:#777;">You are receiving this because you have an account on NUASA Library. If you do not want these emails, reply with "unsubscribe" and we will stop them.</p>
+  <p style="margin:0;font-size:12px;color:#777;">You are receiving this because you have an account on NUASA Library. If you would rather not get these messages, just reply and tell us.</p>
 </div>`;
 
   const text = [
@@ -59,7 +59,7 @@ module.exports = function buildEmail(name) {
     "Regards,",
     "NUASA Library, UNIUYO",
     "",
-    'You are receiving this because you have an account on NUASA Library. Reply with "unsubscribe" to stop these emails.',
+    'You are receiving this because you have an account on NUASA Library. If you would rather not get these messages, just reply and tell us.',
   ].join("\n");
 
   return { subject, html, text };
