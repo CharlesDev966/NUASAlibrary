@@ -2464,7 +2464,7 @@ v.addEventListener("play",()=>{clearInterval(P._t);P._t=setInterval(()=>cpTick(i
 v.addEventListener("pause",()=>{clearInterval(P._t);cpTick(i)});
 v.addEventListener("playing",()=>{retry=0});
 v.addEventListener("ended",()=>{clearInterval(P._t);cpTick(i);if(cur+1<c.vids.length)load(cur+1)});
-v.addEventListener("error",()=>{if(!v.getAttribute("src"))return;if(retry>=2){const e=v.error,cd=e?e.code:0,why=cd===4?"The file could not be opened (format, type or link problem).":cd===3?"The video could not be decoded.":cd===2?"A network error stopped the video.":"The video did not load.";show(why+" Error "+cd+". Tap to try again.");msg.style.cursor="pointer";msg.onclick=()=>{retry=0;msg.onclick=null;msg.style.cursor="";load(cur)};return}retry++;load(cur,v.currentTime)});
+v.addEventListener("error",()=>{if(!v.getAttribute("src"))return;if(retry>=2){const e=v.error,cd=e?e.code:0,why=cd===4?"The file could not be opened (format, type or link problem).":cd===3?"The video could not be decoded.":cd===2?"A network error stopped the video.":"The video did not load.";const fin=d=>{show(why+" Error "+cd+(d?" ("+d+")":"")+". Tap to try again.");msg.style.cursor="pointer";msg.onclick=()=>{retry=0;msg.onclick=null;msg.style.cursor="";load(cur)}};fin();const src=v.currentSrc||v.getAttribute("src");try{fetch(src,{headers:{Range:"bytes=0-1"}}).then(r=>fin("server replied "+r.status+", "+(r.headers.get("content-type")||"no content type")+(r.status===206?", ranges ok":""))).catch(()=>fin("the link could not be checked"))}catch(_){}return}retry++;load(cur,v.currentTime)});
 el.querySelector("[data-mp]").onclick=()=>{if(cur>0)load(cur-1)};
 el.querySelector("[data-mn]").onclick=()=>{if(cur+1<c.vids.length)load(cur+1)};
 load(cur);setTimeout(()=>cpIds(i),800)})}
