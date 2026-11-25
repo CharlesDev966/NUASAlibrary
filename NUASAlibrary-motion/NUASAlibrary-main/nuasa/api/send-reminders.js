@@ -5,8 +5,13 @@ const escapeHtml = (s) =>
   String(s || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 function supabaseHeaders(extra = {}) {
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  return { apikey: key, Authorization: `Bearer ${key}`, ...extra };
+  // Prefer a dedicated variable; fall back to the one the site already has.
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+  const headers = { apikey: key, ...extra };
+  // Legacy service_role keys are JWTs (start with "eyJ") and go in Authorization.
+  // Newer "sb_secret_..." keys must be sent only in the apikey header.
+  if (!String(key).startsWith("sb_")) headers.Authorization = `Bearer ${key}`;
+  return headers;
 }
 
 // 1) Names and roles from the profiles table
