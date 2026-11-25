@@ -68,7 +68,7 @@ module.exports = async (req, res) => {
     const messages = students.map((s) => {
       const { subject, html, text } = buildEmail(s.name);
       return {
-        from: "NUASA Library <reminders@agrochainafrica.ng>",
+        from: "NUASA Library <library@agrochainafrica.ng>",
         reply_to: "nuasalibrary@gmail.com",
         to: s.email,
         subject,
