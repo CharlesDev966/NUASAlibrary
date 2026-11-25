@@ -66,13 +66,14 @@ module.exports = async (req, res) => {
     }
 
     const messages = students.map((s) => {
-      const { subject, html } = buildEmail(s.name);
+      const { subject, html, text } = buildEmail(s.name);
       return {
         from: "NUASA Library <reminders@agrochainafrica.ng>",
         reply_to: "nuasalibrary@gmail.com",
         to: s.email,
         subject,
         html,
+        text,
       };
     });
 
