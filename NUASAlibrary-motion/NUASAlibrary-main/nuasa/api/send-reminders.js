@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
   // FOR TESTING: put ONLY your own email here.
   // Later we will replace this list with your real students.
   const students = [
-    { name: "Your Name", email: "YOUR_EMAIL_HERE@gmail.com" },
+    { name: "Your Name", email: "uetim0069@gmail.com" },
   ];
 
   let sent = 0;
