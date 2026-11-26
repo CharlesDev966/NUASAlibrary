@@ -1613,7 +1613,19 @@ function openAuth(mode){const up=mode==="up";
   if(!email||password.length<6)return $("#aErr").textContent="Enter your email and a password of at least 6 characters.";
   if(up){const pm=pwMsg(password);if(pm)return $("#aErr").textContent=pm}$("#aGo").disabled=true;const res=up?await sb.auth.signUp({email,password,options:{emailRedirectTo:RD(),data:{full_name:$("#aName").value.trim(),matric_no:$("#aMat").value.trim(),level:$("#aLvl").value}}}):await sb.auth.signInWithPassword({email,password});
   $("#aGo").disabled=false;if(res.error){const m=String(res.error.message||"");return $("#aErr").textContent=/load failed|failed to fetch|network|fetch/i.test(m)?"Cannot reach the server. Check your internet connection and try again.":/invalid login credentials/i.test(m)?"Wrong email or password. If you just reset your password, sign in with the new one.":/email not confirmed/i.test(m)?"Confirm your email first (check your inbox), then sign in.":m}if(up&&!res.data.session)return mailSent(email,"confirm");closeModal();{const u0=(res.data&&res.data.user)||{},fn=String((u0.user_metadata&&u0.user_metadata.full_name)||"").trim().split(/\s+/)[0];up?pop("ok","Account created","Welcome to NUASA Library"+(fn?", "+fn:"")+". You are signed in and ready to learn.",{confetti:1,btn:"Start learning"}):pop("ok","You are signed in","Welcome back"+(fn?", "+fn:"")+". Good to see you again.")}}}
-$("#authBtn").onclick=async()=>{if(S.user){await sb.auth.signOut();pop("out","Signed out","You have been signed out safely. See you soon.",{ms:2600,btn:"Done"})}else openAuth("in")};
+/* Sign out that always works: even if the server call fails (weak network, expired token), the saved session is wiped on this device */
+function wipeSession(){try{[localStorage,sessionStorage].forEach(st=>Object.keys(st).filter(k=>/^sb-.*-auth-token/.test(k)||/^supabase\.auth\./.test(k)).forEach(k=>st.removeItem(k)))}catch(e){}}
+async function doSignOut(){
+ let clean=true;
+ try{const r=await Promise.race([sb.auth.signOut({scope:"local"}),new Promise(res=>setTimeout(()=>res({error:{message:"timeout"}}),4000))]);if(r&&r.error)clean=false}catch(e){clean=false}
+ try{const g=await sb.auth.getSession();if(g&&g.data&&g.data.session)clean=false}catch(e){}
+ wipeSession();
+ try{await onUser(null)}catch(e){}
+ try{if($("#erp").classList.contains("show"))erpClose()}catch(e){}
+ pop("out","Signed out","You have been signed out safely. See you soon.",{ms:2600,btn:"Done"});
+ /* the client still held a session in memory: reload so it cannot write it back */
+ if(!clean)setTimeout(()=>location.reload(),1800)}
+$("#authBtn").onclick=async()=>{if(S.user){await doSignOut()}else openAuth("in")};
 async function onUser(u){S.user=u;S.profile=null;S.fullAccess=false;if(u&&sb){try{const {data}=await sb.from("profiles").select("*").eq("id",u.id).maybeSingle();S.profile=data}catch(e){}try{const r=await sb.rpc("has_full_access");S.fullAccess=r.data===true}catch(e){}}S.enr=[];if(u&&sb){try{const r=await sb.from("enrollments").select("course_code,expires_at").eq("user_id",u.id);S.enr=r.data||[]}catch(e){}}document.dispatchEvent(new Event("nuasa-access"));$("#authBtn").textContent=u?"Sign out":"Sign in";menuAcct();$("#admBtn").style.display=isAdmin()?"":"none";$("#dAdm").style.display=isAdmin()?"":"none";if(isAdmin())await loadPending();else closeAdmin();rop();rpx()}
 function openUpload(){if(!sb)return toast("Library service is not reachable.");if(!S.user){toast("Sign in to upload a resource.");return openAuth("in")}
  openModal(mh("Upload a resource",isAdmin()?"Admin uploads are published straight away.":"NUASA executives review uploads before they go live.")+`<div class="form" style="border:0;padding:18px 0 0;background:none">
@@ -2290,6 +2302,8 @@ const ET=[
  {k:"cbt_questions",g:"Content",l:"CBT questions",one:"question",t:"cbt_questions",o:"created_at"},
  {k:"cbt_reports",g:"Content",l:"CBT error reports",one:"report",t:"cbt_reports",o:"created_at",c:["course_code","question","note","created_at"]},
  {k:"profiles",g:"People",l:"Users",one:"user",t:"profiles",o:"created_at",users:1},
+ {k:"page_stats",g:"Analytics",l:"Most visited",one:"section",t:"page_stats",o:"views",c:["section","views","visitors","sessions","last_seen"],s:["section"]},
+ {k:"page_views",g:"Analytics",l:"All visits",one:"visit",t:"page_views",o:"created_at",c:["section","device","referrer","created_at"],s:["section","referrer","device"]},
  {k:"referral_clicks",g:"People",l:"Referral clicks",one:"click",t:"referral_clicks",o:"created_at",c:["code","created_at"],s:["code"]},
  {k:"referrals",g:"People",l:"Referrals",one:"referral",t:"referrals_admin",w:"referrals",o:"created_at",c:["referrer_name","referrer_code","referee_name","user_type","status","reward","created_at"],s:["referrer_name","referrer_code","referee_name","referrer_email"],
   f:[["All",0],["Normal users",q=>q.eq("user_type","Normal user")],["Paid users",q=>q.eq("user_type","Paid user")],["Charles (4D9EAFC1)",q=>q.eq("referrer_code","4D9EAFC1")]],
@@ -2320,7 +2334,7 @@ function eCell(k,v,r){if(v===null||v===undefined||v==="")return'<span class="mut
  return esc(String(v))}
 function erpOpen(){if(!isAdmin())return;$("#erp").classList.add("show");document.body.style.overflow="hidden";erpShell();eGo(E.cur||"home")}
 function erpClose(){$("#erp").classList.remove("show");if(!$("#pjp").classList.contains("show")&&!$("#adm").classList.contains("show"))document.body.style.overflow=""}
-function erpShell(){const groups=["Content","People"].concat([...new Set(E.tmp.map(x=>x.g))]);
+function erpShell(){const groups=["Content","People","Analytics"].concat([...new Set(E.tmp.map(x=>x.g))]);
  $("#erp").innerHTML=`<div class="eTop"><b>Admin console</b><span class="note" style="flex:1">Edit anything on the site</span><button class="btn s" id="eBack" style="height:38px">Back to site</button></div>
  <div class="eBody"><nav class="eSide" aria-label="Admin sections"><a data-m="home" id="m-home">Dashboard</a>${groups.map(g=>`<div class="gl">${g}</div>${ET.concat(E.tmp).filter(x=>x.g===g).map(x=>`<a data-m="${x.k}" id="m-${x.k}">${esc(x.l)}${E.counts[x.k]!=null?`<em>${E.counts[x.k]}</em>`:""}</a>`).join("")}`).join("")}
  <div class="gl">Tools</div><a data-m="@review">Review queue and uploads</a><a data-m="@other">Open another table…</a></nav><main class="eMain" id="eMain"></main></div>`}
@@ -2742,6 +2756,33 @@ async function panel(){
  g("rfS").onclick=async()=>{const v=g("rfP").value.trim();if(!sb)return toast("Could not save right now.");try{const r=await sb.from("referral_codes").update({payout:v}).eq("user_id",S.user.id);toast(r.error?"Could not save. Try again.":"Payout details saved.")}catch(e){toast("Could not save. Try again.")}};
 }
 document.addEventListener("click",e=>{if(e.target.closest("[data-pjref]")){e.preventDefault();e.stopPropagation();panel()}},true);
+})();
+</script>
+<script id="visit-tracker">
+/* ---- Visit tracking: which sections people view. Table: page_views (see admin-analytics.sql) ---- */
+(function(){
+try{
+ if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname))return;
+ var g=function(st,k){try{var v=st.getItem(k);if(!v){v=(Math.random().toString(36).slice(2)+Date.now().toString(36));st.setItem(k,v)}return v}catch(e){return "x"}};
+ var vid=g(localStorage,"nuasa_vid"),sid=g(sessionStorage,"nuasa_sid"),seen={};
+ var NAMES={top:"Home",library:"Library",latest:"Library",nlm:"NotebookLM",classes:"Professional Certifications",opps:"Opportunities",cbt:"CBT Practice",courses:"Masterclasses",how:"How it works",faq:"FAQ"};
+ var dev=/Mobi|Android|iPhone/i.test(navigator.userAgent)?"mobile":"desktop";
+ var ref="";try{if(document.referrer){var u=new URL(document.referrer);if(u.hostname!==location.hostname)ref=u.hostname}}catch(e){}
+ function log(sec){
+  if(!sec||seen[sec])return;seen[sec]=1;
+  setTimeout(function(){
+   try{var c=window.NUASA_SB;if(!c)return;if(typeof isAdmin==="function"&&isAdmin())return;
+    c.from("page_views").insert({visitor_id:vid,session_id:sid,section:sec,referrer:ref||null,device:dev}).then(function(){},function(){})}catch(e){}
+  },2500)}
+ function watch(){
+  if(!("IntersectionObserver" in window)){log("Home");return}
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){log(NAMES[e.target.id]);io.unobserve(e.target)}})},{threshold:.35});
+  Object.keys(NAMES).forEach(function(id){var el=document.getElementById(id);if(el)io.observe(el)})}
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watch);else watch();
+ /* tools opened from buttons (not scroll sections) */
+ document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("[data-cbt],[data-vl],#dPj,[data-up],[data-pjref]");if(!t)return;
+  log(t.hasAttribute("data-cbt")?"CBT Practice (button)":t.hasAttribute("data-vl")?"Virtual Library":t.id==="dPj"?"Project AI":t.hasAttribute("data-up")?"Upload a resource":"Refer and earn")},true);
+}catch(e){}
 })();
 </script>
 <script id="motion-js">
