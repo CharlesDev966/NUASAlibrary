@@ -1960,7 +1960,7 @@ async function tgGen(){if(TG.busy)return;tgRead();if(TG.form.field.length<3){TG.
   const d=await r.json();if(!d.topics||!d.topics.length)throw new Error("No topics came back. Tap Generate again.");TG.list=d.topics;tgSave()}
  catch(e){TG.err=e.message||"Something went wrong."}
  TG.busy=false;if($("#pjp").classList.contains("show")&&PJ.tab==="topics")pjRender()}
-function pjTabs(){return `<div class="pjTabs" role="tablist"><button class="pjTab ${PJ.tab==="topics"?"":"on"}" role="tab" data-tab="draft">Draft writer</button><button class="pjTab ${PJ.tab==="topics"?"on":""}" role="tab" data-tab="topics">Topic generator</button></div>`}
+function pjTabs(){return `<div class="pjTabs" role="tablist"><button class="pjTab ${PJ.tab==="topics"?"":"on"}" role="tab" data-tab="draft">Draft writer</button><button class="pjTab ${PJ.tab==="topics"?"on":""}" role="tab" data-tab="topics">Topic generator</button><button class="pjTab" type="button" data-pjref>Earn ₦10k</button></div>`}
 $("#pjp").addEventListener("click",e=>{const t=e.target,c=s=>t.closest(s);let b;
  if(b=c("[data-tab]")){const to=b.dataset.tab;if(to===PJ.tab)return;pjReadForm();tgRead();PJ.tab=to;pjRender();return}
  if(c("#pjToTopics")){pjReadForm();PJ.tab="topics";pjRender();return}
@@ -2696,6 +2696,47 @@ document.addEventListener("click",e=>{if(e.target.closest("[data-cbtpay]"))cbtPa
 const sel=".card,.cc,#crg article,.lv>*,.demo,.rr";
 document.addEventListener("pointermove",e=>{const t=e.target.closest&&e.target.closest(sel);if(!t)return;const r=t.getBoundingClientRect();t.style.setProperty("--mx",(e.clientX-r.left)+"px");t.style.setProperty("--my",(e.clientY-r.top)+"px")},{passive:true});
 const up=()=>{const h=document.documentElement,m=h.scrollHeight-h.clientHeight;sp.style.width=(m>0?h.scrollTop/m*100:0)+"%"};addEventListener("scroll",up,{passive:true});up()})();
+</script>
+<script>
+/* ---- Project AI referrals: bank-transfer flow, no Paystack. Tables: referral_codes, referrals (see referrals.sql) ---- */
+(function(){
+const REF_REWARD=10000,RK="nuasa_ref",fmt=n=>"₦"+Number(n).toLocaleString("en-US");
+const myCode=()=>S.user?String(S.user.id).replace(/-/g,"").slice(0,8).toUpperCase():"";
+const stored=()=>{try{return localStorage.getItem(RK)||""}catch(e){return ""}};
+/* 1. someone opens a referral link: remember the code */
+try{const r=new URLSearchParams(location.search).get("ref");if(r&&/^[A-Za-z0-9]{4,12}$/.test(r)){localStorage.setItem(RK,r.toUpperCase());setTimeout(()=>toast("Referral link saved. Sign in and open Project AI to use it."),1500)}}catch(e){}
+/* 2. the friend opens the Project AI paywall: record who referred them (first referrer wins) */
+async function track(c){if(!sb||!S.user)return;try{await sb.from("referrals").insert({referrer_code:c,referee_id:S.user.id,reward:REF_REWARD})}catch(e){}}
+const pw=window.pjPaywall;
+if(typeof pw==="function")window.pjPaywall=function(){const r=pw.apply(this,arguments),c=stored();
+ if(c&&S.user&&c!==myCode()){track(c);const b=document.querySelector("#md .pyi");if(b)b.insertAdjacentHTML("afterbegin",'<p class="note" style="margin-bottom:10px">Referral code <b>'+esc2(c)+'</b> applied to your account.</p>')}
+ return r};
+/* 3. the referrer panel: link, share, stats, payout details */
+async function panel(){
+ if(!S.user){toast("Sign in to get your referral link.");if(typeof openAuth==="function")openAuth("in");return}
+ const code=myCode(),link=location.origin+"/?ref="+code;let ok=!!sb,payout="",rows=[];
+ if(sb){try{
+  const a=await sb.from("referral_codes").upsert({code:code,user_id:S.user.id,name:(S.profile&&S.profile.full_name)||"",email:S.user.email||""},{onConflict:"user_id",ignoreDuplicates:true});if(a.error)ok=false;
+  const b=await sb.from("referral_codes").select("payout").eq("user_id",S.user.id).maybeSingle();payout=(b.data&&b.data.payout)||"";
+  const c=await sb.from("referrals").select("status").eq("referrer_code",code);if(c.error)ok=false;else rows=c.data||[];
+ }catch(e){ok=false}}
+ const n=s=>rows.filter(r=>r.status===s).length;
+ const stats=ok?'<div class="payR"><span class="note">Friends referred</span><b>'+rows.length+'</b></div><div class="payR"><span class="note">Confirmed, waiting to be paid to you</span><b>'+fmt(n("confirmed")*REF_REWARD)+'</b></div><div class="payR"><span class="note">Already paid to you</span><b>'+fmt(n("paid")*REF_REWARD)+'</b></div>'
+  :'<p class="note">Referral tracking is not available right now. Please try again later.</p>';
+ openModal(mh("Refer and earn "+fmt(REF_REWARD),"When a friend pays "+fmt(PJ_PRICE)+" for Project AI using your link, you get "+fmt(REF_REWARD)+" of it.")
+  +'<div style="display:grid;gap:12px;padding-top:12px"><div class="payR"><span class="note">Your code</span><b>'+code+'</b></div>'
+  +'<input class="inp" id="rfL" readonly value="'+esc2(link)+'">'
+  +'<button type="button" class="btn p" id="rfC">Copy link</button>'
+  +'<a class="btn s" target="_blank" rel="noopener" href="https://wa.me/?text='+encodeURIComponent("Write your final year project with Project AI: "+link)+'">Share on WhatsApp</a>'
+  +stats
+  +'<label><span class="note">Where should we send your reward?</span><input class="inp" id="rfP" placeholder="Bank, account number, account name" value="'+esc2(payout)+'" style="margin-top:6px"></label>'
+  +'<button type="button" class="btn s" id="rfS">Save payout details</button>'
+  +'<p class="note">Your friend must sign in and pay from the Project AI page after opening your link. Once their payment is confirmed, your reward is sent by bank transfer. You cannot refer yourself.</p></div>');
+ g("rfC").onclick=()=>{try{navigator.clipboard.writeText(link).then(()=>toast("Link copied."),()=>{g("rfL").select();toast("Select the link and copy it.")})}catch(e){g("rfL").select();toast("Select the link and copy it.")}};
+ g("rfS").onclick=async()=>{const v=g("rfP").value.trim();if(!sb)return toast("Could not save right now.");try{const r=await sb.from("referral_codes").update({payout:v}).eq("user_id",S.user.id);toast(r.error?"Could not save. Try again.":"Payout details saved.")}catch(e){toast("Could not save. Try again.")}};
+}
+document.addEventListener("click",e=>{if(e.target.closest("[data-pjref]")){e.preventDefault();e.stopPropagation();panel()}},true);
+})();
 </script>
 <script id="motion-js">
 (function(){
