@@ -2708,7 +2708,7 @@ const REF_REWARD=10000,RK="nuasa_ref",fmt=n=>"₦"+Number(n).toLocaleString("en-
 const myCode=()=>S.user?String(S.user.id).replace(/-/g,"").slice(0,8).toUpperCase():"";
 const stored=()=>{try{return localStorage.getItem(RK)||""}catch(e){return ""}};
 /* 1. someone opens a referral link: remember the code */
-try{const r=new URLSearchParams(location.search).get("ref");if(r&&/^[A-Za-z0-9]{4,12}$/.test(r)){localStorage.setItem(RK,r.toUpperCase());setTimeout(()=>toast("Referral link saved. Sign in and open Project AI to use it."),1500);
+try{const r=new URLSearchParams(location.search).get("ref");if(r&&/^[A-Za-z0-9]{4,12}$/.test(r)){localStorage.setItem(RK,r.toUpperCase());
  try{if(!sessionStorage.getItem("nuasa_ref_click")){sessionStorage.setItem("nuasa_ref_click","1");setTimeout(()=>{try{if(window.sb||typeof sb!=="undefined")sb.from("referral_clicks").insert({code:r.toUpperCase()}).then(()=>{},()=>{})}catch(e){}},1200)}}catch(e){}}}catch(e){}
 /* 2. the friend opens the Project AI paywall: record who referred them (first referrer wins) */
 async function track(c){if(!sb||!S.user)return;try{await sb.from("referrals").insert({referrer_code:c,referee_id:S.user.id,reward:REF_REWARD})}catch(e){}}
