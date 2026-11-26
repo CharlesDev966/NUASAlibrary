@@ -2289,9 +2289,12 @@ const ET=[
  {k:"opportunities",g:"Content",l:"Opportunities",one:"opportunity",t:"opportunities",o:"created_at"},
  {k:"cbt_questions",g:"Content",l:"CBT questions",one:"question",t:"cbt_questions",o:"created_at"},
  {k:"cbt_reports",g:"Content",l:"CBT error reports",one:"report",t:"cbt_reports",o:"created_at",c:["course_code","question","note","created_at"]},
- {k:"profiles",g:"People",l:"Users",one:"user",t:"profiles",o:"created_at",users:1}];
+ {k:"profiles",g:"People",l:"Users",one:"user",t:"profiles",o:"created_at",users:1},
+ {k:"referrals",g:"People",l:"Referrals",one:"referral",t:"referrals_admin",w:"referrals",o:"created_at",c:["referrer_name","referrer_code","referee_name","status","reward","created_at"],s:["referrer_name","referrer_code","referee_name","referrer_email"],
+  f:[["All",0],["Pending",q=>q.eq("status","pending")],["Confirmed",q=>q.eq("status","confirmed")],["Paid",q=>q.eq("status","paid")],["Charles (4D9EAFC1)",q=>q.eq("referrer_code","4D9EAFC1")]],
+  sel:{status:["pending","confirmed","paid"]},bulk:[["Mark confirmed",{status:"confirmed"}],["Mark paid",{status:"paid"}]]}];
 const E={cur:"home",st:{},tmp:[],counts:{}};
-const eRO=k=>/^(id|created_at|updated_at|created_by|uploaded_by|user_id)$/.test(k),
+const eRO=k=>/^(id|created_at|updated_at|created_by|uploaded_by|user_id|referrer_name|referrer_email|referee_name|referee_id|referrer_code)$/.test(k),
  eLb=k=>{const s=k.replace(/_id$/,"").replace(/_/g," ");return s[0].toUpperCase()+s.slice(1)},
  eCfg=k=>ET.concat(E.tmp).find(x=>x.k===k),
  eSt=k=>E.st[k]||(E.st[k]={page:0,size:25,q:"",f:0,o:eCfg(k).o,asc:!!eCfg(k).asc,rows:[],n:0,sel:new Set(),err:"",loading:false,sample:null}),
@@ -2371,7 +2374,7 @@ function eEdit(id){const cfg=eCfg(E.cur),row=eSt(E.cur).rows.find(r=>String(r.id
  $("#eSave").onclick=async()=>{const msg=m=>$("#eMsg").textContent=m;let patch;try{patch=eRead(row,false)}catch(e){return msg(e.message)}
   if(!Object.keys(patch).length){closeModal();return toast("No changes.")}
   if(cfg.users&&String(row.id)===String(S.user.id)&&patch.role&&patch.role!=="admin")return msg("You can't remove your own admin access.");
-  const b=$("#eSave");b.disabled=true;b.textContent="Saving...";const r=await sb.from(cfg.t).update(patch).eq("id",row.id);
+  const b=$("#eSave");b.disabled=true;b.textContent="Saving...";const r=await sb.from(cfg.w||cfg.t).update(patch).eq("id",row.id);
   if(r.error){b.disabled=false;b.textContent="Save changes";return msg(r.error.message+" (if this says permission denied, run admin-permissions.sql in Supabase)")}
   closeModal();toast("Saved.");await eRefresh();eSync(cfg)};
  $("#eDel").onclick=async()=>{closeModal();await eDelete(cfg,[row])}}
@@ -2379,11 +2382,11 @@ function eAdd(){const cfg=eCfg(E.cur),st=eSt(E.cur),known=Object.keys(st.sample|
  openModal(mh("Add "+esc(cfg.one?"a "+cfg.one:"to "+cfg.l.toLowerCase()),known?"Leave a field empty to skip it.":"This table is empty, so paste the new row as JSON.")+`<div class="form" style="border:0;padding:16px 0 0;background:none;max-height:62vh;overflow:auto">${known?eFields(cfg,null,true):'<label>Row as JSON<textarea class="inp eTa mono" rows="8" id="eJson" placeholder=\'{"title":"Example"}\'></textarea></label>'}</div><p class="note" id="eMsg" style="color:var(--r);margin-top:10px"></p><div style="display:flex;gap:10px;margin-top:14px"><button class="btn p" id="eSave">Add</button><button class="btn s" data-x>Cancel</button></div>`,true);
  $("#eSave").onclick=async()=>{const msg=m=>$("#eMsg").textContent=m;let row;try{row=known?eRead(null,true):JSON.parse($("#eJson").value||"{}")}catch(e){return msg(e.message)}
   if(!Object.keys(row).length)return msg("Fill in at least one field.");if(S.user&&cfg.t==="resources"&&!row.status)row.status="approved";
-  const b=$("#eSave");b.disabled=true;b.textContent="Adding...";const r=await sb.from(cfg.t).insert(row);
+  const b=$("#eSave");b.disabled=true;b.textContent="Adding...";const r=await sb.from(cfg.w||cfg.t).insert(row);
   if(r.error){b.disabled=false;b.textContent="Add";return msg(r.error.message)}closeModal();toast("Added.");await eRefresh();eSync(cfg)}}
 async function eDelete(cfg,rows){if(!rows.length)return;if(!confirm(`Delete ${rows.length} ${rows.length===1?"row":"rows"} from ${cfg.l}? This cannot be undone.`))return;
  const paths=rows.flatMap(r=>Object.keys(r).filter(k=>/_path$/.test(k)&&r[k]).map(k=>r[k]));
- const r=await sb.from(cfg.t).delete().in("id",rows.map(x=>x.id));if(r.error)return toast(r.error.message);
+ const r=await sb.from(cfg.w||cfg.t).delete().in("id",rows.map(x=>x.id));if(r.error)return toast(r.error.message);
  if(paths.length&&confirm(`Also delete the ${paths.length} stored file${paths.length===1?"":"s"} that belonged to ${rows.length===1?"it":"them"}?`)){try{await sb.storage.from(BUCKET).remove(paths)}catch(e){}}
  eSt(cfg.k).sel.clear();toast("Deleted.");await eRefresh();eSync(cfg)}
 async function eExport(){const cfg=eCfg(E.cur),st=eSt(E.cur),r=await eFetch(cfg,st,true);if(r.error)return toast(r.error.message);const rows=r.data||[];if(!rows.length)return toast("Nothing to export.");
@@ -2400,8 +2403,8 @@ $("#erp").addEventListener("click",async e=>{const t=e.target,c=s=>t.closest(s);
  if(b=c("[data-sel]")){const st=eSt(E.cur),id=String(b.closest("tr").dataset.id);b.checked?st.sel.add(id):st.sel.delete(id);return eBulk()}
  if(c("#eClr")){eSt(E.cur).sel.clear();$$("#eTbl [data-sel]").forEach(x=>x.checked=false);const a=$("#eAll");if(a)a.checked=false;return eBulk()}
  if(c("#eDelSel")){const st=eSt(E.cur);return eDelete(eCfg(E.cur),st.rows.filter(r=>st.sel.has(String(r.id))))}
- if(b=c("[data-bk]")){const cfg=eCfg(E.cur),st=eSt(E.cur),act=cfg.bulk[+b.dataset.bk],ids=[...st.sel];b.disabled=true;const r=await sb.from(cfg.t).update(act[1]).in("id",ids);if(r.error){b.disabled=false;return toast(r.error.message)}st.sel.clear();toast("Updated "+ids.length+".");await eRefresh();return eSync(cfg)}
- if(b=c("[data-tg]")){const tr=b.closest("tr"),cfg=eCfg(E.cur),row=eSt(E.cur).rows.find(r=>String(r.id)===tr.dataset.id),k=b.dataset.tg;b.disabled=true;const r=await sb.from(cfg.t).update({[k]:!row[k]}).eq("id",row.id);if(r.error){b.disabled=false;return toast(r.error.message)}row[k]=!row[k];b.disabled=false;b.classList.toggle("on",row[k]);b.setAttribute("aria-pressed",row[k]);return eSync(cfg)}
+ if(b=c("[data-bk]")){const cfg=eCfg(E.cur),st=eSt(E.cur),act=cfg.bulk[+b.dataset.bk],ids=[...st.sel];b.disabled=true;const r=await sb.from(cfg.w||cfg.t).update(act[1]).in("id",ids);if(r.error){b.disabled=false;return toast(r.error.message)}st.sel.clear();toast("Updated "+ids.length+".");await eRefresh();return eSync(cfg)}
+ if(b=c("[data-tg]")){const tr=b.closest("tr"),cfg=eCfg(E.cur),row=eSt(E.cur).rows.find(r=>String(r.id)===tr.dataset.id),k=b.dataset.tg;b.disabled=true;const r=await sb.from(cfg.w||cfg.t).update({[k]:!row[k]}).eq("id",row.id);if(r.error){b.disabled=false;return toast(r.error.message)}row[k]=!row[k];b.disabled=false;b.classList.toggle("on",row[k]);b.setAttribute("aria-pressed",row[k]);return eSync(cfg)}
  if(b=c("[data-ed]")){const tr=b.closest("tr");if(tr)return eEdit(tr.dataset.id)}
  if(b=c("tr[data-id]")){if(c("input,button,a,select"))return;return eEdit(b.dataset.id)}});
 $("#erp").addEventListener("input",e=>{if(e.target.id==="eQ"){const st=eSt(E.cur);st.q=e.target.value;st.page=0;clearTimeout(E._q);E._q=setTimeout(eRefresh,300)}});
