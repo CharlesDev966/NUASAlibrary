@@ -2079,7 +2079,7 @@ async function tgGen(){if(TG.busy)return;tgRead();if(TG.form.field.length<3){TG.
   const d=await r.json();if(!d.topics||!d.topics.length)throw new Error("No topics came back. Tap Generate again.");TG.list=d.topics;tgSave()}
  catch(e){TG.err=e.message||"Something went wrong."}
  TG.busy=false;if($("#pjp").classList.contains("show")&&PJ.tab==="topics")pjRender()}
-function pjTabs(){return `<div class="pjTabs" role="tablist"><button class="pjTab ${PJ.tab==="topics"?"":"on"}" role="tab" data-tab="draft">Draft writer</button><button class="pjTab ${PJ.tab==="topics"?"on":""}" role="tab" data-tab="topics">Topic generator</button><button class="pjTab" type="button" data-pjref>Earn ₦10k</button></div>`}
+function pjTabs(){return `<div class="pjTabs" role="tablist"><button class="pjTab ${PJ.tab==="topics"?"":"on"}" role="tab" data-tab="draft">Draft writer</button><button class="pjTab ${PJ.tab==="topics"?"on":""}" role="tab" data-tab="topics">Topic generator</button></div>`}
 $("#pjp").addEventListener("click",e=>{const t=e.target,c=s=>t.closest(s);let b;
  if(b=c("[data-tab]")){const to=b.dataset.tab;if(to===PJ.tab)return;pjReadForm();tgRead();PJ.tab=to;pjRender();return}
  if(c("#pjToTopics")){pjReadForm();PJ.tab="topics";pjRender();return}
